@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ view.object and 'Editar Producto' or 'Nuevo Producto' }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ view.object and 'Editar Producto' or 'Nuevo Producto' }}</h2>
+    <form method="post" novalidate>
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <a href="{% url 'productos:lista' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}
