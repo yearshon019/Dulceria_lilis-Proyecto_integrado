@@ -1,10 +1,21 @@
-{% extends 'base.html' %}
+{% extends 'dashboard.html' %}
 {% load static %}
-{% block title %}{{ view.object and 'Editar Producto' or 'Nuevo Producto' }}{% endblock %}
-
+{% block title %}
+    {% if view.object %}
+        Editar Producto
+    {% else %}
+        Nuevo Producto
+    {% endif %}
+{% endblock %}
 {% block content %}
 <div class="container mt-4">
-    <h2>{{ view.object and 'Editar Producto' or 'Nuevo Producto' }}</h2>
+    <h2>
+        {% if view.object %}
+            Editar Producto
+        {% else %}
+            Nuevo Producto
+        {% endif %}
+    </h2>
     <form method="post" novalidate>
         {% csrf_token %}
         {{ form.as_p }}

@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+from django.contrib.messages import constants
 
 load_dotenv()
 
@@ -150,3 +151,22 @@ MEDIA_ROOT = BASE_DIR / 'media'
 LOGIN_URL = 'usuarios:login'
 LOGIN_REDIRECT_URL = 'dashboard'
 LOGOUT_REDIRECT_URL = 'usuarios:login'
+
+
+SESSION_COOKIE_AGE = 60 * 60 * 2
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+SESSION_SAVE_EVERY_REQUEST = False
+
+SESSION_COOKIE_SECURE = True
+
+SESSION_COOKIE_SAME_SITE = 'Lax'
+
+MESSAGE_TAGS = {
+    constants.DEBUG: 'secondary',
+    constants.INFO: 'info',
+    constants.SUCCESS: 'success',
+    constants.WARNING: 'warning',
+    constants.ERROR: 'danger',
+}
