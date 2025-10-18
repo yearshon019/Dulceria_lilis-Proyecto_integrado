@@ -1,12 +1,12 @@
-# proveedores/urls.py
 from django.urls import path
-from django.http import HttpResponse
+from . import views
 
 app_name = 'proveedores'
 
-def temporal(request):
-    return HttpResponse("Ruta temporal de proveedores funcionando")
-
 urlpatterns = [
-    path('', temporal, name='inicio'),
+    path('', views.ProveedorListView.as_view(), name='lista'),
+    path('crear/', views.ProveedorCreateView.as_view(), name='crear'),
+    path('<int:pk>/editar/', views.ProveedorUpdateView.as_view(), name='editar'),
+    path('<int:pk>/eliminar/', views.ProveedorDeleteView.as_view(), name='eliminar'),
+    path('<int:pk>/', views.ProveedorDetailView.as_view(), name='detalle'),
 ]

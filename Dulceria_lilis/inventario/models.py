@@ -12,11 +12,13 @@ TIPO_MOVIMIENTO = [
 ]
 
 class Bodega(models.Model):
+    codigo = models.CharField(max_length=50, unique=True)  # Ej: BOD-CENTRAL
     nombre = models.CharField(max_length=120)
     ubicacion = models.CharField(max_length=255, blank=True, null=True)
+    descripcion = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return self.nombre
+        return f"{self.codigo} - {self.nombre}"
 
 class Lote(models.Model):
     codigo = models.CharField(max_length=120)
@@ -37,8 +39,10 @@ class MovimientoInventario(models.Model):
     cantidad = models.DecimalField(max_digits=12, decimal_places=2)
     lote = models.ForeignKey(Lote, on_delete=models.SET_NULL, null=True, blank=True)
     serie = models.CharField(max_length=120, blank=True, null=True)
+    fecha_vencimiento = models.DateField(blank=True, null=True)  # útil si no se usa lote
     usuario = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True, blank=True)
     observacion = models.TextField(blank=True, null=True)
+    documento_referencia = models.CharField(max_length=100, blank=True, null=True)  # Ej: OC-101, FAC-900
 
     def __str__(self):
         return f"{self.tipo} {self.producto} ({self.cantidad})"

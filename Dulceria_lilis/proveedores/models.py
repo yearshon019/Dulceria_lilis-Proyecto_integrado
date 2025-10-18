@@ -26,7 +26,6 @@ class Proveedor(models.Model):
     def __str__(self):
         return self.razon_social
 
-
 class ProductoProveedor(models.Model):
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
     proveedor = models.ForeignKey(Proveedor, on_delete=models.CASCADE)

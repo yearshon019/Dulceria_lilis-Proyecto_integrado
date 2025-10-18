@@ -1,0 +1,62 @@
+{% extends 'dashboard.html' %}
+{% load static %}
+
+{% block title %}Lista de Proveedores{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-primary">
+            <i class="bi bi-people"></i> Lista de Proveedores
+        </h2>
+        <a href="{% url 'proveedores:crear' %}" class="btn btn-success">
+            <i class="bi bi-plus-circle"></i> Nuevo Proveedor
+        </a>
+    </div>
+
+    {% if proveedores %}
+    <div class="table-responsive">
+        <table class="table table-hover align-middle shadow-sm">
+            <thead class="table-primary">
+                <tr>
+                    <th>RUT/NIF</th>
+                    <th>Razón Social</th>
+                    <th>Email</th>
+                    <th>Teléfono</th>
+                    <th>Ciudad</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for proveedor in proveedores %}
+                <tr>
+                    <td>{{ proveedor.rut_nif }}</td>
+                    <td>{{ proveedor.razon_social }}</td>
+                    <td>{{ proveedor.email }}</td>
+                    <td>{{ proveedor.telefono }}</td>
+                    <td>{{ proveedor.ciudad }}</td>
+                    <td>{{ proveedor.estado }}</td>
+                    <td>
+                        <a href="{% url 'proveedores:detalle' proveedor.id %}" class="btn btn-sm btn-info" title="Detalle">
+                            <i class="bi bi-info-circle"></i>
+                        </a>
+                        <a href="{% url 'proveedores:editar' proveedor.id %}" class="btn btn-sm btn-warning" title="Editar">
+                            <i class="bi bi-pencil-square"></i>
+                        </a>
+                        <a href="{% url 'proveedores:eliminar' proveedor.id %}" class="btn btn-sm btn-danger" title="Eliminar">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info text-center shadow-sm">
+        No hay proveedores registrados aún.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

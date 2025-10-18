@@ -13,6 +13,7 @@ class Producto(models.Model):
     uom_venta = models.CharField(max_length=20, default='UN')
     factor_conversion = models.DecimalField(max_digits=10, decimal_places=4, default=1)
     costo_estandar = models.DecimalField(max_digits=18, decimal_places=2, blank=True, null=True)
+    costo_promedio = models.DecimalField(max_digits=18, decimal_places=2, blank=True, null=True)  # solo lectura si calculas
     precio_venta = models.DecimalField(max_digits=18, decimal_places=2, blank=True, null=True)
     impuesto_iva = models.DecimalField(max_digits=5, decimal_places=2, default=19.0)
 
@@ -26,8 +27,10 @@ class Producto(models.Model):
     imagen_url = models.URLField(blank=True, null=True)
     ficha_tecnica_url = models.URLField(blank=True, null=True)
 
-    # stock_actual será calculado por el inventario (campo denormalizado opcional)
     stock_actual = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+
+    def alerta_bajo_stock(self):
+        return self.stock_actual <= (self.punto_reorden or self.stock_minimo)
 
     def __str__(self):
         return f"{self.sku} - {self.nombre}"

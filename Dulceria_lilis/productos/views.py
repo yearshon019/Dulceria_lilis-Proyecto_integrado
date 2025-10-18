@@ -1,48 +1,105 @@
-from pyexpat.errors import messages
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
+from django import forms
 from .models import Producto
-from .forms import ProductoForm
-from django.shortcuts import get_object_or_404, redirect
+
+
+# ----------------------------------------------------------
+# FORMULARIO PERSONALIZADO PARA PRODUCTO
+# ----------------------------------------------------------
+class ProductoForm(forms.ModelForm):
+    class Meta:
+        model = Producto
+        fields = '__all__'
+        widgets = {
+            'sku': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: CHOCO-001'}),
+            'ean_upc': forms.TextInput(attrs={'class': 'form-control'}),
+            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+            'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'categoria': forms.TextInput(attrs={'class': 'form-control'}),
+            'marca': forms.TextInput(attrs={'class': 'form-control'}),
+            'modelo': forms.TextInput(attrs={'class': 'form-control'}),
+            'uom_compra': forms.TextInput(attrs={'class': 'form-control'}),
+            'uom_venta': forms.TextInput(attrs={'class': 'form-control'}),
+            'factor_conversion': forms.NumberInput(attrs={'class': 'form-control'}),
+            'costo_estandar': forms.NumberInput(attrs={'class': 'form-control'}),
+            'costo_promedio': forms.NumberInput(attrs={'class': 'form-control', 'readonly': True}),
+            'precio_venta': forms.NumberInput(attrs={'class': 'form-control'}),
+            'impuesto_iva': forms.NumberInput(attrs={'class': 'form-control'}),
+            'stock_minimo': forms.NumberInput(attrs={'class': 'form-control'}),
+            'stock_maximo': forms.NumberInput(attrs={'class': 'form-control'}),
+            'punto_reorden': forms.NumberInput(attrs={'class': 'form-control'}),
+            'perishable': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'control_por_lote': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'control_por_serie': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'imagen_url': forms.URLInput(attrs={'class': 'form-control'}),
+            'ficha_tecnica_url': forms.URLInput(attrs={'class': 'form-control'}),
+            'stock_actual': forms.NumberInput(attrs={'class': 'form-control', 'readonly': True}),
+        }
+
+    # Validación personalizada para precios
+    def clean_precio_venta(self):
+        precio = self.cleaned_data.get('precio_venta')
+        if precio is not None and precio < 0:
+            raise forms.ValidationError("El precio de venta no puede ser negativo.")
+        return precio
+
+
+# ----------------------------------------------------------
+# LISTAR PRODUCTOS
+# ----------------------------------------------------------
 class ProductoListView(ListView):
     model = Producto
     template_name = 'productos/lista.html'
-    context_object_name = 'object_list'
-    paginate_by = 25
+    context_object_name = 'productos'
+    ordering = ['nombre']
 
+
+# ----------------------------------------------------------
+# CREAR PRODUCTO
+# ----------------------------------------------------------
 class ProductoCreateView(CreateView):
     model = Producto
     form_class = ProductoForm
     template_name = 'productos/form.html'
-    success_url = reverse_lazy('productos:lista')
+    success_url = reverse_lazy('productos:lista')  
 
-    
+    def form_valid(self, form):
+        sku = form.cleaned_data.get('sku')
+        if Producto.objects.filter(sku=sku).exists():
+            form.add_error('sku', 'Ya existe un producto con este SKU.')
+            return self.form_invalid(form)
+        return super().form_valid(form)
+
+
+# ----------------------------------------------------------
+# EDITAR PRODUCTO
+# ----------------------------------------------------------
 class ProductoUpdateView(UpdateView):
     model = Producto
     form_class = ProductoForm
     template_name = 'productos/form.html'
-    success_url = reverse_lazy('productos:lista')
+    success_url = reverse_lazy('productos:lista')  
 
+
+# ----------------------------------------------------------
+# ELIMINAR PRODUCTO
+# ----------------------------------------------------------
 class ProductoDeleteView(DeleteView):
     model = Producto
     template_name = 'productos/confirm_delete.html'
-    success_url = reverse_lazy('productos:lista')
+    success_url = reverse_lazy('productos:lista')  
 
+
+# ----------------------------------------------------------
+# DETALLE DE PRODUCTO
+# ----------------------------------------------------------
 class ProductoDetailView(DetailView):
     model = Producto
-    template_name = 'productos/detail.html'
+    template_name = 'productos/detalle.html'
 
-def add_to_cart(request, pk):
-    Producto =get_object_or_404(Producto, pk=pk)
-    if Producto.stock_actual > 0:
-        messages.success(request, f'El producto {Producto.nombre} ha sido agregado al carrito.')
-    else:
-        messages.error(request, f'El producto {Producto.nombre} no tiene stock disponible.')
-    return redirect('productos:lista')
-
-def mensajes(request):
-    messages.add_message(request, messages.INFO, 'Esto es un mensaje de información.')
-    messages.add_message(request, messages.SUCCESS, 'Esto es un mensaje de éxito.')
-    messages.add_message(request, messages.WARNING, 'Esto es un mensaje de advertencia.')
-    messages.add_message(request, messages.ERROR, 'Esto es un mensaje de error.')
-    return redirect('productos:lista')
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Calcular alerta de bajo stock
+        context['alerta_bajo_stock'] = self.object.alerta_bajo_stock()
+        return context
