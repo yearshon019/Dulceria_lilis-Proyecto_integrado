@@ -1,0 +1,18 @@
+{% extends "usuarios/base.html" %}
+{% block title %}Detalle Movimiento{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Detalle del Movimiento</h2>
+  <ul class="list-group">
+    <li class="list-group-item"><strong>Fecha:</strong> {{ movimiento.fecha }}</li>
+    <li class="list-group-item"><strong>Tipo:</strong> {{ movimiento.tipo }}</li>
+    <li class="list-group-item"><strong>Producto:</strong> {{ movimiento.producto }}</li>
+    <li class="list-group-item"><strong>Cantidad:</strong> {{ movimiento.cantidad }}</li>
+    <li class="list-group-item"><strong>Bodega Origen:</strong> {{ movimiento.bodega_origen }}</li>
+    <li class="list-group-item"><strong>Bodega Destino:</strong> {{ movimiento.bodega_destino }}</li>
+    <li class="list-group-item"><strong>Usuario:</strong> {{ movimiento.usuario }}</li>
+    <li class="list-group-item"><strong>Observación:</strong> {{ movimiento.observacion }}</li>
+  </ul>
+  <a href="{% url 'inventario:inicio' %}" class="btn btn-secondary mt-3">Volver</a>
+</div>
+{% endblock %}

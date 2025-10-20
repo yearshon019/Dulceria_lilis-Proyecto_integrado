@@ -1,12 +1,11 @@
-# inventario/urls.py
 from django.urls import path
-from django.http import HttpResponse
+from . import views
 
 app_name = 'inventario'
 
-def temporal(request):
-    return HttpResponse("Ruta temporal de inventario funcionando")
-
 urlpatterns = [
-    path('', temporal, name='inicio'),
+    path('', views.MovimientoInventarioListView.as_view(), name='inicio'),
+    path('movimiento/nuevo/', views.MovimientoInventarioCreateView.as_view(), name='crear_movimiento'),
+    path('movimiento/<int:pk>/', views.MovimientoInventarioDetailView.as_view(), name='detalle_movimiento'),
+    path('bodegas/', views.BodegaListView.as_view(), name='bodegas'),
 ]
