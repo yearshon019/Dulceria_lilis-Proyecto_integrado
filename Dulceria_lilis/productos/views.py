@@ -2,7 +2,10 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
 from django import forms
 from .models import Producto
-
+from sistema.decorators import permiso_requerido
+from django.utils.decorators import method_decorator
+from django.contrib import messages
+from django.shortcuts import redirect, get_object_or_404
 
 # ----------------------------------------------------------
 # FORMULARIO PERSONALIZADO PARA PRODUCTO
@@ -48,6 +51,7 @@ class ProductoForm(forms.ModelForm):
 # ----------------------------------------------------------
 # LISTAR PRODUCTOS
 # ----------------------------------------------------------
+@method_decorator(permiso_requerido('productos.view_producto'), name='dispatch')
 class ProductoListView(ListView):
     model = Producto
     template_name = 'productos/lista.html'
@@ -58,6 +62,9 @@ class ProductoListView(ListView):
 # ----------------------------------------------------------
 # CREAR PRODUCTO
 # ----------------------------------------------------------
+
+
+@method_decorator(permiso_requerido('productos.add_producto'), name='dispatch')
 class ProductoCreateView(CreateView):
     model = Producto
     form_class = ProductoForm
@@ -75,6 +82,7 @@ class ProductoCreateView(CreateView):
 # ----------------------------------------------------------
 # EDITAR PRODUCTO
 # ----------------------------------------------------------
+@method_decorator(permiso_requerido('productos.change_producto'), name='dispatch')
 class ProductoUpdateView(UpdateView):
     model = Producto
     form_class = ProductoForm
@@ -85,15 +93,22 @@ class ProductoUpdateView(UpdateView):
 # ----------------------------------------------------------
 # ELIMINAR PRODUCTO
 # ----------------------------------------------------------
+@method_decorator(permiso_requerido('productos.delete_producto'), name='dispatch')
 class ProductoDeleteView(DeleteView):
     model = Producto
-    template_name = 'productos/confirm_delete.html'
-    success_url = reverse_lazy('productos:lista')  
+    success_url = reverse_lazy('productos:lista')
+    def get(self, request, *args, **kwargs):
+        producto = get_object_or_404(Producto, pk=kwargs['pk'])
+        producto.delete()
+        messages.success(request, f"Producto '{producto.nombre}' eliminado correctamente.")
+        return redirect(self.success_url)
+
 
 
 # ----------------------------------------------------------
 # DETALLE DE PRODUCTO
 # ----------------------------------------------------------
+@method_decorator(permiso_requerido('productos.view_producto'), name='dispatch')
 class ProductoDetailView(DetailView):
     model = Producto
     template_name = 'productos/detalle.html'

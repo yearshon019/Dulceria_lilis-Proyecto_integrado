@@ -10,58 +10,57 @@
 
     <div class="row mt-5">
         <!-- Productos -->
+        {% if perms.productos.view_producto %}
         <div class="col-md-4 mb-3">
             <div class="card shadow-sm border-0 h-100">
                 <div class="card-body text-center">
                     <i class="bi bi-box-seam display-5 text-primary"></i>
                     <h5 class="mt-3">Productos</h5>
                     <p class="text-muted">Gestiona el catálogo de productos.</p>
-                    <a href="{% url 'productos:lista' %}" class="btn btn-outline-primary w-100">
-                        Ir a Productos
-                    </a>
+                    <a href="{% url 'productos:lista' %}" class="btn btn-primary">Ir a Productos</a>
                 </div>
             </div>
         </div>
+        {% endif %}
 
         <!-- Proveedores -->
+        {% if perms.proveedores.view_proveedor %}
         <div class="col-md-4 mb-3">
             <div class="card shadow-sm border-0 h-100">
                 <div class="card-body text-center">
                     <i class="bi bi-truck display-5 text-success"></i>
                     <h5 class="mt-3">Proveedores</h5>
                     <p class="text-muted">Administra tus proveedores y condiciones.</p>
-                    <a href="{% url 'proveedores:lista' %}" class="btn btn-outline-success w-100">
-                        Ir a Proveedores
-                    </a>
+                    <a href="{% url 'proveedores:lista' %}" class="btn btn-success">Ir a Proveedores</a>
                 </div>
             </div>
         </div>
+        {% endif %}
 
         <!-- Inventario -->
+        {% if perms.inventario.view_bodega %}
         <div class="col-md-4 mb-3">
             <div class="card shadow-sm border-0 h-100">
                 <div class="card-body text-center">
                     <i class="bi bi-clipboard-data display-5 text-warning"></i>
                     <h5 class="mt-3">Inventario</h5>
                     <p class="text-muted">Control de movimientos y stock.</p>
-                    <a href="{% url 'inventario:inicio' %}" class="btn btn-outline-warning w-100">
-                        Ir a Inventario
-                    </a>
+                    <a href="{% url 'inventario:inicio' %}" class="btn btn-warning">Ir a Inventario</a>
                 </div>
             </div>
         </div>
+        {% endif %}
     </div> <!-- Fin de fila de tarjetas -->
 
     {% if messages %}
-        <div class="container mt-3" style="margin-top: 100px;">
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endfor %}
+    <div class="container mt-3" style="margin-top: 100px;">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
+        {% endfor %}
+    </div>
     {% endif %}
 </div> <!-- Fin del contenedor principal -->
-
 {% endblock %}

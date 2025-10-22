@@ -27,3 +27,4 @@ def cambiar_clave(request):
     #     messages.error(request, 'Clave "productos" eliminada de la sesión.')
 
     return redirect('dashboard.html')
+
