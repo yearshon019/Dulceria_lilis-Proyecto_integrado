@@ -1,0 +1,90 @@
+{% extends 'dashboard.html' %}
+{% load static %}
+
+{% block title %}Lista de Productos{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-primary">
+            <i class="bi bi-box-seam"></i> Lista de Productos
+        </h2>
+        {% if perms.productos.add_producto %}
+        <a href="{% url 'productos:crear' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Nuevo Producto
+        </a>
+        {% endif %}
+    </div>
+
+    {% if object_list %}
+    <div class="table-responsive">
+        <table class="table table-hover align-middle shadow-sm">
+            <thead class="table-primary">
+                <tr>
+                    <th>SKU</th>
+                    <th>Nombre</th>
+                    <th>Categoría</th>
+                    <th>Precio Venta</th>
+                    <th>Stock Actual</th>
+                    <th>IVA</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for producto in object_list %}
+                <tr>
+                    <td>{{ producto.sku }}</td>
+                    <td>{{ producto.nombre }}</td>
+                    <td>{{ producto.categoria }}</td>
+                    <td>${{ producto.precio_venta|floatformat:0 }}</td>
+                    <td>{{ producto.stock_actual }}</td>
+                    <td>{{ producto.impuesto_iva }}%</td>
+                    <td>
+                        <!-- 🔹 Botón de detalle -->
+                        <a href="{% url 'productos:detalle' producto.pk %}" class="btn btn-sm btn-info" title="Ver Detalle">
+                            <i class="bi bi-eye"></i>
+                        </a>
+
+                        {% if perms.productos.change_producto %}
+                        <a href="{% url 'productos:editar' producto.pk %}" class="btn btn-sm btn-warning" title="Editar">
+                            <i class="bi bi-pencil-square"></i>
+                        </a>
+                        {% endif %}
+
+                        {% if perms.productos.delete_producto %}
+                        <button onclick="confirmarEliminacion('{{ producto.pk }}')" class="btn btn-sm btn-danger" title="Eliminar">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info text-center shadow-sm">
+        No hay productos registrados aún.
+    </div>
+    {% endif %}
+</div>
+
+<!-- SweetAlert2 para eliminar -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+function confirmarEliminacion(id) {
+    Swal.fire({
+        title: '¿Eliminar producto?',
+        text: 'Esta acción no se puede deshacer.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = `/productos/${id}/eliminar/`;
+        }
+    });
+}
+</script>
+{% endblock %}

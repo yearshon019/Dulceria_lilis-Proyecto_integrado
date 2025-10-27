@@ -1,0 +1,88 @@
+{% extends "dashboard.html" %}
+{% load static %}
+
+{% block title %}Detalle del Proveedor - Dulcería Lili{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="text-center mb-4">
+        <img src="{% static 'img/logo.png' %}" alt="Logo Dulcería Lili" width="90" class="mb-2">
+        <h2 class="fw-bold text-danger">Detalle del Proveedor</h2>
+        <p class="text-muted">Información detallada del proveedor seleccionado</p>
+    </div>
+
+    <div class="card shadow-lg border-0 mb-4">
+        <div class="card-header bg-danger text-white fw-bold">
+            {{ object.razon_social|upper }}
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>RUT/NIF:</strong> {{ object.rut_nif }}</p>
+                    <p><strong>Nombre Fantasía:</strong> {{ object.nombre_fantasia }}</p>
+                    <p><strong>Email:</strong> {{ object.email }}</p>
+                    <p><strong>Teléfono:</strong> {{ object.telefono }}</p>
+                    <p><strong>Dirección:</strong> {{ object.direccion }}</p>
+                    <p><strong>Ciudad:</strong> {{ object.ciudad }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>País:</strong> {{ object.pais }}</p>
+                    <p><strong>Condiciones de Pago:</strong> {{ object.condiciones_pago }}</p>
+                    <p><strong>Moneda:</strong> {{ object.moneda }}</p>
+                    <p><strong>Contacto Principal:</strong> 
+                        {{ object.contacto_principal_nombre }} 
+                        ({{ object.contacto_principal_email }}, {{ object.contacto_principal_telefono }})
+                    </p>
+                    <p><strong>Estado:</strong>
+                        {% if object.estado == "ACTIVO" %}
+                            <span class="badge bg-success">{{ object.estado }}</span>
+                        {% else %}
+                            <span class="badge bg-secondary">{{ object.estado }}</span>
+                        {% endif %}
+                    </p>
+                    <p><strong>Observaciones:</strong> {{ object.observaciones|default:"Sin observaciones" }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h4 class="fw-bold text-danger mb-3">
+        <i class="bi bi-box-seam"></i> Productos Asociados
+    </h4>
+    {% if productos_asociados %}
+        <div class="table-responsive">
+            <table class="table table-striped align-middle shadow-sm">
+                <thead class="table-danger text-center">
+                    <tr>
+                        <th>Nombre del Producto</th>
+                        <th>SKU</th>
+                        <th>Precio</th>
+                    </tr>
+                </thead>
+                <tbody class="text-center">
+                    {% for prod in productos_asociados %}
+                    <tr>
+                        <td>{{ prod.producto.nombre }}</td>
+                        <td>{{ prod.producto.sku }}</td>
+                        <td>{{ prod.precio }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-warning text-center shadow-sm">
+            <i class="bi bi-exclamation-circle"></i> No hay productos asociados a este proveedor.
+        </div>
+    {% endif %}
+
+    <div class="text-center mt-4">
+        <a href="{% url 'proveedores:editar' object.id %}" class="btn btn-warning me-2">
+            <i class="bi bi-pencil-square"></i> Editar
+        </a>
+        <a href="{% url 'proveedores:lista' %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Volver a la lista
+        </a>
+    </div>
+</div>
+{% endblock %}

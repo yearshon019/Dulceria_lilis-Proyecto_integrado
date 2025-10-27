@@ -1,0 +1,40 @@
+{% extends "usuarios/base.html" %}
+{% load static %}
+{% block title %}Iniciar sesión - Dulcería Lili{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="card shadow-lg p-4" style="width: 380px; border-radius: 15px;">
+        <div class="text-center mb-3">
+            <img src="{% static 'img/logo.png' %}" alt="Logo Dulcería Lili" width="100" class="mb-2">
+            <h2 class="h5 fw-bold text-danger">Dulcería Lili</h2>
+            <p class="text-muted mb-0">Inicia sesión para continuar</p>
+        </div>
+
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger py-2">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Usuario</label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                <div class="text-danger small">{{ form.username.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Contraseña</label>
+                {{ form.password }}
+                {% if form.password.errors %}
+                <div class="text-danger small">{{ form.password.errors }}</div>
+                {% endif %}
+            </div>
+
+            <button class="btn btn-danger w-100 fw-semibold" type="submit">Entrar</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
