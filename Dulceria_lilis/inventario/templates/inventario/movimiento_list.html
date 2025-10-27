@@ -1,4 +1,5 @@
 {% extends "usuarios/base.html" %}
+<<<<<<< HEAD
 {% load static %}
 
 {% block title %}Movimientos de Inventario{% endblock %}
@@ -57,5 +58,45 @@
         No hay movimientos registrados aún.
     </div>
     {% endif %}
+=======
+{% block title %}Movimientos de Inventario{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Movimientos de Inventario</h2>
+  <a href="{% url 'inventario:crear_movimiento' %}" class="btn btn-success mb-3">Nuevo Movimiento</a>
+
+  {% if movimientos %}
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Tipo</th>
+        <th>Producto</th>
+        <th>Cantidad</th>
+        <th>Bodega Origen</th>
+        <th>Bodega Destino</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for mov in movimientos %}
+      <tr>
+        <td>{{ mov.fecha|date:"d/m/Y H:i" }}</td>
+        <td>{{ mov.tipo }}</td>
+        <td>{{ mov.producto.nombre }}</td>
+        <td>{{ mov.cantidad }}</td>
+        <td>{{ mov.bodega_origen }}</td>
+        <td>{{ mov.bodega_destino }}</td>
+        <td>
+          <a href="{% url 'inventario:detalle_movimiento' mov.pk %}" class="btn btn-sm btn-primary">Ver</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>No hay movimientos registrados.</p>
+  {% endif %}
+>>>>>>> 35238ce3c7b5ffbc00cce3e386f10ecdd91faba0
 </div>
 {% endblock %}

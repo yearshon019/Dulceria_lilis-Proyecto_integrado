@@ -1,4 +1,5 @@
 {% extends "usuarios/base.html" %}
+<<<<<<< HEAD
 {% load static %}
 
 {% block title %}Lista de Bodegas{% endblock %}
@@ -40,5 +41,31 @@
         No hay bodegas registradas en el sistema.
     </div>
     {% endif %}
+=======
+{% block title %}Bodegas{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Listado de Bodegas</h2>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Código</th>
+        <th>Nombre</th>
+        <th>Ubicación</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for b in bodegas %}
+      <tr>
+        <td>{{ b.codigo }}</td>
+        <td>{{ b.nombre }}</td>
+        <td>{{ b.ubicacion }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="3" class="text-center">No hay bodegas registradas.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+>>>>>>> 35238ce3c7b5ffbc00cce3e386f10ecdd91faba0
 </div>
 {% endblock %}

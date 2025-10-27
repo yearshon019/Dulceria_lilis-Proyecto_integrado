@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {% extends "dashboard.html" %}
 {% load static %}
 
@@ -79,5 +80,18 @@
             </form>
         </div>
     </div>
+=======
+{% extends "usuarios/base.html" %}
+{% block title %}Registrar Movimiento{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Registrar Movimiento</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a href="{% url 'inventario:inicio' %}" class="btn btn-secondary">Cancelar</a>
+  </form>
+>>>>>>> 35238ce3c7b5ffbc00cce3e386f10ecdd91faba0
 </div>
 {% endblock %}

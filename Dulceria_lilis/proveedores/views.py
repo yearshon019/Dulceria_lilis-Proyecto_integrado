@@ -96,6 +96,7 @@ class ProveedorCreateView(CreateView):
     template_name = 'proveedores/form_proveedor.html'
     success_url = reverse_lazy('proveedores:lista')
 
+<<<<<<< HEAD
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Crear'
@@ -103,6 +104,10 @@ class ProveedorCreateView(CreateView):
 
     def form_valid(self, form):
         # Evitar duplicados por email
+=======
+    def form_valid(self, form):
+        # Si el email ya existe, prevenir duplicados
+>>>>>>> 35238ce3c7b5ffbc00cce3e386f10ecdd91faba0
         email = form.cleaned_data.get('email')
         if Proveedor.objects.filter(email=email).exists():
             form.add_error('email', 'Ya existe un proveedor con este correo electrónico.')
@@ -119,11 +124,14 @@ class ProveedorUpdateView(UpdateView):
     template_name = 'proveedores/form_proveedor.html'
     success_url = reverse_lazy('proveedores:lista')
 
+<<<<<<< HEAD
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Editar'
         return context
 
+=======
+>>>>>>> 35238ce3c7b5ffbc00cce3e386f10ecdd91faba0
 
 # ----------------------------------------------------------
 # ELIMINAR PROVEEDOR

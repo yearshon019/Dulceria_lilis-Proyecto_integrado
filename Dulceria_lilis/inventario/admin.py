@@ -1,4 +1,5 @@
 from django.contrib import admin
+<<<<<<< HEAD
 from .models import MovimientoInventario, Bodega, Lote
 
 
@@ -25,3 +26,10 @@ class MovimientoInventarioAdmin(admin.ModelAdmin):
 
     # Campos que se completan automáticamente con búsqueda
     autocomplete_fields = ("producto", "proveedor", "bodega_origen", "bodega_destino", "lote")
+=======
+
+# Register your models here.
+from .models import MovimientoInventario
+
+admin.site.register(MovimientoInventario)
+>>>>>>> 35238ce3c7b5ffbc00cce3e386f10ecdd91faba0

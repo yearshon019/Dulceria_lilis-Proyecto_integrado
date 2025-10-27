@@ -40,11 +40,14 @@
                     <td>{{ producto.stock_actual }}</td>
                     <td>{{ producto.impuesto_iva }}%</td>
                     <td>
+<<<<<<< HEAD
                         <!-- 🔹 Botón de detalle -->
                         <a href="{% url 'productos:detalle' producto.pk %}" class="btn btn-sm btn-info" title="Ver Detalle">
                             <i class="bi bi-eye"></i>
                         </a>
 
+=======
+>>>>>>> 35238ce3c7b5ffbc00cce3e386f10ecdd91faba0
                         {% if perms.productos.change_producto %}
                         <a href="{% url 'productos:editar' producto.pk %}" class="btn btn-sm btn-warning" title="Editar">
                             <i class="bi bi-pencil-square"></i>

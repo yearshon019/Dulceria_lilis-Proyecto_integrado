@@ -1,5 +1,6 @@
 {% extends 'dashboard.html' %}
 {% load static %}
+<<<<<<< HEAD
 
 {% block title %}
     {% if view.object %}Editar Producto{% else %}Nuevo Producto{% endif %}
@@ -30,5 +31,29 @@
             </form>
         </div>
     </div>
+=======
+{% block title %}
+    {% if view.object %}
+        Editar Producto
+    {% else %}
+        Nuevo Producto
+    {% endif %}
+{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2>
+        {% if view.object %}
+            Editar Producto
+        {% else %}
+            Nuevo Producto
+        {% endif %}
+    </h2>
+    <form method="post" novalidate>
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <a href="{% url 'productos:lista' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+>>>>>>> 35238ce3c7b5ffbc00cce3e386f10ecdd91faba0
 </div>
 {% endblock %}

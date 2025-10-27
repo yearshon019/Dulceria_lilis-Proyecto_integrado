@@ -9,8 +9,13 @@ def dashboard(request):
     request.session['visitas'] = visitas + 1
 
     # Ejemplos de mensajes (estos se mostrarán en tu plantilla)
+<<<<<<< HEAD
    # messages.success(request, 'Producto agregado al carrito correctamente.')
     #messages.error(request, 'Stock insuficiente para completar la operación.')
+=======
+    messages.success(request, 'Producto agregado al carrito correctamente.')
+    messages.error(request, 'Stock insuficiente para completar la operación.')
+>>>>>>> 35238ce3c7b5ffbc00cce3e386f10ecdd91faba0
 
     # Renderizar el panel principal
     return render(request, 'dashboard.html', {'visitas': visitas})

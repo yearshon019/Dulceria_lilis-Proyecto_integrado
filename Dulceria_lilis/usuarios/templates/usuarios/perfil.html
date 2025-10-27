@@ -1,4 +1,5 @@
 {% extends "usuarios/base.html" %}
+<<<<<<< HEAD
 {% load static %}
 {% block title %}Mi Perfil - Dulcería Lili{% endblock %}
 
@@ -48,4 +49,17 @@
         </div>
     </div>
 </div>
+=======
+{% block title %}Perfil{% endblock %}
+
+{% block content %}
+<h2>Mi perfil</h2>
+<ul class="list-group">
+    <li class="list-group-item"><strong>Usuario:</strong> {{ user.username }}</li>
+    <li class="list-group-item"><strong>Email:</strong> {{ user.email }}</li>
+    <li class="list-group-item"><strong>Nombre:</strong> {{ user.nombres }} {{ user.apellidos }}</li>
+    <li class="list-group-item"><strong>Rol:</strong> {{ user.rol }}</li>
+    <li class="list-group-item"><strong>Último acceso:</strong> {{ user.ultimo_acceso }}</li>
+</ul>
+>>>>>>> 35238ce3c7b5ffbc00cce3e386f10ecdd91faba0
 {% endblock %}
