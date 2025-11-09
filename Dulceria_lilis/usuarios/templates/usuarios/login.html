@@ -1,0 +1,54 @@
+{% extends "usuarios/base.html" %}
+{% load static %}
+
+{% block title %}Iniciar sesión - Dulcería Lili{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center" style="min-height: 85vh;">
+    <div class="card shadow-lg p-4" style="width: 400px; border-radius: 15px;">
+        <div class="text-center mb-3">
+            <img src="{% static 'img/Logo.png' %}" alt="Logo Dulcería Lili" width="100" class="mb-2">
+            <h2 class="h5 fw-bold text-danger mb-0">Dulcería Lili</h2>
+            <p class="text-muted small">Inicia sesión para continuar</p>
+        </div>
+
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger py-2">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            <div class="mb-3 input-group">
+                <span class="input-group-text bg-white border-0">
+                    <i class="bi bi-person-fill text-danger"></i>
+                </span>
+                {{ form.username }}
+            </div>
+            {% if form.username.errors %}
+            <div class="text-danger small mb-2">{{ form.username.errors }}</div>
+            {% endif %}
+
+            <div class="mb-3 input-group">
+                <span class="input-group-text bg-white border-0">
+                    <i class="bi bi-lock-fill text-danger"></i>
+                </span>
+                {{ form.password }}
+            </div>
+            {% if form.password.errors %}
+            <div class="text-danger small mb-2">{{ form.password.errors }}</div>
+            {% endif %}
+
+            <button class="btn btn-danger w-100 fw-semibold mt-2" type="submit">
+                <i class="bi bi-box-arrow-in-right"></i> Entrar
+            </button>
+
+            <div class="text-center mt-3">
+                <a href="{% url 'usuarios:password_reset' %}" class="text-decoration-none text-muted small">
+                    <i class="bi bi-question-circle"></i> ¿Olvidaste tu contraseña?
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

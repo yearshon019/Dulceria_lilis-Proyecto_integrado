@@ -1,0 +1,235 @@
+{% extends 'usuarios/base.html' %}
+{% load static %}
+
+{% block title %}Editar Proveedor – {{ object.razon_social }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="fw-bold text-primary">
+      <i class="bi bi-pencil-square"></i> Editar Proveedor
+    </h2>
+    <a href="{% url 'proveedores:lista' %}" class="btn btn-secondary">
+      <i class="bi bi-arrow-left"></i> Volver a la lista
+    </a>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-header text-white" style="background-color:#c62828;">
+      <div class="d-flex justify-content-between align-items-center">
+        <h4 class="mb-0"><i class="bi bi-building"></i> {{ object.razon_social }}</h4>
+        <img src="{% static 'img/logo.png' %}" alt="Logo Dulcería Lili" width="40" height="40">
+      </div>
+    </div>
+
+    <div class="card-body bg-light">
+
+      {% if form.errors %}
+<div class="alert alert-danger mb-3">
+  <strong>Corrige los siguientes campos:</strong>
+  <ul class="mb-0">
+    {# Errores por campo #}
+    {% for f in form %}
+      {% for e in f.errors %}
+        <li><strong>{{ f.label }}:</strong> {{ e }}</li>
+      {% endfor %}
+    {% endfor %}
+    {# Errores no asociados a un campo específico #}
+    {% for e in form.non_field_errors %}
+      <li>{{ e }}</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+
+      <ul class="nav nav-tabs mb-3" id="provTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="tab-ident" data-bs-toggle="tab" data-bs-target="#pane-ident" type="button" role="tab">
+            1. Identificación y contacto
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="tab-comercial" data-bs-toggle="tab" data-bs-target="#pane-comercial" type="button" role="tab">
+            2. Dirección y comercial
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="tab-relacion" data-bs-toggle="tab" data-bs-target="#pane-relacion" type="button" role="tab">
+            3. Relación con productos
+          </button>
+        </li>
+          <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="tab-asociar" data-bs-toggle="tab" data-bs-target="#pane-asociar" type="button" role="tab">
+            4. Asociar producto(s)
+          </button>
+        </li>
+      </ul>
+
+      {# Importante: sin "action" para que postee a la misma URL de edición #}
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="tab-content">
+
+          <!-- 1) Identificación y contacto -->
+          <div class="tab-pane fade show active" id="pane-ident" role="tabpanel" aria-labelledby="tab-ident">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">RUT/NIF<span class="text-danger">*</span></label>
+                {{ form.rut_nif }}
+                {% for e in form.rut_nif.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Razón social<span class="text-danger">*</span></label>
+                {{ form.razon_social }}
+                {% for e in form.razon_social.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Nombre fantasía</label>
+                {{ form.nombre_fantasia }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Email<span class="text-danger">*</span></label>
+                {{ form.email }}
+                {% for e in form.email.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Teléfono</label>
+                {{ form.telefono }}
+                {% for e in form.telefono.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Sitio web</label>
+                {{ form.sitio_web }}
+              </div>
+            </div>
+          </div>
+
+          <!-- 2) Dirección y comercial -->
+          <div class="tab-pane fade" id="pane-comercial" role="tabpanel" aria-labelledby="tab-comercial">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Dirección</label>
+                {{ form.direccion }}
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Ciudad</label>
+                {{ form.ciudad }}
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">País</label>
+                {{ form.pais }}
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Condiciones de pago</label>
+                {{ form.condiciones_pago }}
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Moneda</label>
+                {{ form.moneda }}
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Estado</label>
+                {{ form.estado }}
+              </div>
+            </div>
+          </div>
+
+          <!-- 3) Relación con productos -->
+          <div class="tab-pane fade" id="pane-relacion" role="tabpanel" aria-labelledby="tab-relacion">
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label class="form-label">Contacto principal (nombre)</label>
+                {{ form.contacto_principal_nombre }}
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Contacto principal (email)</label>
+                {{ form.contacto_principal_email }}
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Contacto principal (teléfono)</label>
+                {{ form.contacto_principal_telefono }}
+              </div>
+              <div class="col-12">
+                <label class="form-label">Observaciones</label>
+                {{ form.observaciones }}
+              </div>
+            </div>
+          </div>
+          <div class="tab-pane fade show active" id="pane-asociar" role="tabpanel" aria-labelledby="tab-asociar">
+    <p class="text-muted mb-2">Añade, edita o elimina productos asociados a este proveedor.</p>
+
+
+    {{ pp_formset.management_form }}
+
+    <div class="table-responsive">
+  <table class="table align-middle">
+    <thead class="table-light">
+      <tr>
+        <th style="width: 55%">Producto</th>
+        <th style="width: 25%">Costo</th>
+        <th style="width: 10%" class="text-center">Preferente</th>
+        <th style="width: 10%" class="text-center">Eliminar</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for f in pp_formset.forms %}
+        <tr>
+          <td>{{ f.producto }}</td>
+          <td>{{ f.costo }}</td>
+          <td class="text-center">{{ f.preferente }}</td>
+          <td class="text-center">
+            {% if f.instance.pk %}
+              {{ f.DELETE }} <span class="small text-muted">Quitar</span>
+            {% endif %}
+          </td>
+        </tr>
+
+        {% if f.non_field_errors %}
+          <tr><td colspan="4" class="text-danger small">{{ f.non_field_errors }}</td></tr>
+        {% endif %}
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+    </div>
+
+    {# Botones globales del formulario (ya los tendrás al final); si no, ponlos aquí: #}
+    <div class="d-flex justify-content-end gap-2">
+      <a href="{% url 'proveedores:lista' %}" class="btn btn-secondary">
+        ← Volver a la lista
+      </a>
+      <button type="submit" class="btn btn-danger">
+        <i class="bi bi-save"></i> Guardar cambios
+      </button>
+    </div>
+  </div>
+</div>
+        </div>
+
+        <div class="d-flex justify-content-end mt-4">
+          <a href="{% url 'proveedores:lista' %}" class="btn btn-secondary me-2">
+            <i class="bi bi-arrow-left"></i> Cancelar
+          </a>
+          <button type="submit" class="btn btn-danger">
+            <i class="bi bi-save"></i> Guardar cambios
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const firstError = document.querySelector('.tab-pane .text-danger.small');
+  if (!firstError) return;
+  const pane = firstError.closest('.tab-pane');
+  if (!pane || !pane.id) return;
+  const trigger = document.querySelector(`[data-bs-target="#${pane.id}"]`);
+  if (trigger) new bootstrap.Tab(trigger).show();
+});
+</script>
+{% endblock %}

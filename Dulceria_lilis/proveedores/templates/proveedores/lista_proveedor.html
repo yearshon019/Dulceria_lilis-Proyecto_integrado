@@ -1,0 +1,249 @@
+{% extends 'usuarios/base.html' %}
+{% load static %}
+
+{% block title %}Proveedores{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+  <!-- Encabezado -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="fw-bold text-primary">
+      <i class="bi bi-building"></i> Lista de Proveedores
+    </h2>
+    <div class="col-md-2 d-grid">
+  <a class="btn btn-success"
+     href="?export=xlsx">
+    <i class="bi bi-file-earmark-excel"></i> Exportar Excel
+  </a>
+</div>
+  </div>
+
+
+  <!-- Tabla de proveedores -->
+  <div class="card shadow-sm mb-5">
+    <div class="card-body">
+      {% if proveedores %}
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead class="table-primary">
+            <tr>
+              <th>RUT/NIF</th>
+              <th>Razón social</th>
+              <th>Email</th>
+              <th>Teléfono</th>
+              <th>Ciudad</th>
+              <th>Estado</th>
+              <th class="text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in proveedores %}
+            <tr>
+              <td>{{ p.rut_nif }}</td>
+              <td>{{ p.razon_social }}</td>
+              <td>{{ p.email|default:"—" }}</td>
+              <td>{{ p.telefono|default:"—" }}</td>
+              <td>{{ p.ciudad|default:"—" }}</td>
+              <td>
+                {% if p.estado == 'ACTIVO' %}
+                  <span class="badge bg-success">ACTIVO</span>
+                {% elif p.estado == 'BLOQUEADO' %}
+                  <span class="badge bg-danger">BLOQUEADO</span>
+                {% else %}
+                  <span class="badge bg-secondary">{{ p.estado }}</span>
+                {% endif %}
+              </td>
+              <td class="text-center">
+                <a href="{% url 'proveedores:editar' p.id %}" class="btn btn-sm btn-warning" title="Editar">
+                  <i class="bi bi-pencil-square"></i>
+                </a>
+                <button onclick="confirmarEliminacion('{{ p.id }}')" class="btn btn-sm btn-danger" title="Eliminar">
+                  <i class="bi bi-trash"></i>
+                </button>
+                </a>
+                <a href="{% url 'proveedores:detalle' p.id %}" class="btn btn-sm btn-info" title="Detalle">
+                  <i class="bi bi-info-circle"></i>
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+        <div class="alert alert-info mb-0">No hay proveedores registrados.</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Formulario embebido: Registrar proveedor -->
+  <div class="card shadow-sm">
+    <div class="card-header text-white" style="background-color:#c62828;">
+      <div class="d-flex justify-content-between align-items-center">
+        <h4 class="mb-0"><i class="bi bi-person-plus"></i> Formulario de Proveedor</h4>
+        <img src="{% static 'img/logo.png' %}" alt="Logo Dulcería Lili" width="40" height="40">
+      </div>
+    </div>
+
+    <div class="card-body bg-light">
+
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger mb-3">
+          {% for e in form.non_field_errors %}{{ e }}<br>{% endfor %}
+        </div>
+      {% endif %}
+      
+      <!-- Pestañas -->
+      <ul class="nav nav-tabs mb-3" id="provTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="tab-ident" data-bs-toggle="tab" data-bs-target="#pane-ident" type="button" role="tab">
+            1. Identificación y contacto
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="tab-comercial" data-bs-toggle="tab" data-bs-target="#pane-comercial" type="button" role="tab">
+            2. Dirección y comercial
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="tab-relacion" data-bs-toggle="tab" data-bs-target="#pane-relacion" type="button" role="tab">
+            3. Relación con productos
+          </button>
+        </li>
+      </ul>
+
+      <form method="post" action="{% url 'proveedores:lista' %}" novalidate>
+        {% csrf_token %}
+        <div class="tab-content">
+
+          <!-- 1) Identificación y contacto -->
+          <div class="tab-pane fade show active" id="pane-ident" role="tabpanel" aria-labelledby="tab-ident">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">RUT/NIF<span class="text-danger">*</span></label>
+                {{ form.rut_nif }}
+                {% for e in form.rut_nif.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Razón social<span class="text-danger">*</span></label>
+                {{ form.razon_social }}
+                {% for e in form.razon_social.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Nombre fantasía</label>
+                {{ form.nombre_fantasia }}
+                {% for e in form.nombre_fantasia.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Email<span class="text-danger">*</span></label>
+                {{ form.email }}
+                {% for e in form.email.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Teléfono</label>
+                {{ form.telefono }}
+                {% for e in form.telefono.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Sitio web</label>
+                {{ form.sitio_web }}
+                {% for e in form.sitio_web.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+              </div>
+            </div>
+          </div>
+
+          <!-- 2) Dirección y comercial -->
+          <div class="tab-pane fade" id="pane-comercial" role="tabpanel" aria-labelledby="tab-comercial">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Dirección</label>
+                {{ form.direccion }}
+                {% for e in form.direccion.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Ciudad</label>
+                {{ form.ciudad }}
+                {% for e in form.ciudad.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">País</label>
+                {{ form.pais }}
+                {% for e in form.pais.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Condiciones de pago</label>
+                {{ form.condiciones_pago }}
+                {% for e in form.condiciones_pago.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Moneda</label>
+                {{ form.moneda }}
+                {% for e in form.moneda.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Estado</label>
+                {{ form.estado }}
+                {% for e in form.estado.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+              </div>
+            </div>
+          </div>
+
+          <!-- 3) Relación con productos / Contacto principal -->
+          <div class="tab-pane fade" id="pane-relacion" role="tabpanel" aria-labelledby="tab-relacion">
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label class="form-label">Contacto principal (nombre)</label>
+                {{ form.contacto_principal_nombre }}
+                {% for e in form.contacto_principal_nombre.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Contacto principal (email)</label>
+                {{ form.contacto_principal_email }}
+                {% for e in form.contacto_principal_email.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Contacto principal (teléfono)</label>
+                {{ form.contacto_principal_telefono }}
+                {% for e in form.contacto_principal_telefono.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+              </div>
+              <div class="col-12">
+                <label class="form-label">Observaciones</label>
+                {{ form.observaciones }}
+                {% for e in form.observaciones.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Acciones -->
+        <div class="d-flex justify-content-end mt-4">
+          <button type="reset" class="btn btn-secondary me-2">
+            <i class="bi bi-eraser"></i> Limpiar
+          </button>
+          <button type="submit" class="btn btn-danger">
+            <i class="bi bi-save"></i> Guardar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>
+<!-- SweetAlert2 para eliminar -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+function confirmarEliminacion(id) {
+  Swal.fire({
+    title: '¿Eliminar Proveedor?',
+    text: 'Esta acción no se puede deshacer.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Sí, eliminar',
+    cancelButtonText: 'Cancelar'
+  }).then((r) => { if (r.isConfirmed) window.location.href = `/proveedores/${id}/eliminar/`; });
+}
+</script>
+
+{% endblock %}
