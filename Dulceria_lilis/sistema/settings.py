@@ -94,8 +94,8 @@ if ENGINE == "mysql":
             "PASSWORD": os.getenv("DB_PASSWORD"),
             "HOST": os.getenv("DB_HOST", "localhost"),
             "PORT": os.getenv("DB_PORT", "3306"),
-            #"OPTIONS": {"charset": "utf8mb4",
-            #            "ssl": {"ca": "/etc/ssl/certs/aws-rds/rds-combined-ca-bundle.pem"}},
+            "OPTIONS": {"charset": "utf8mb4",
+                        "ssl": {"ca": "/etc/ssl/certs/aws-rds/rds-combined-ca-bundle.pem"}},
         }
     }
 else:  # SQLite por defecto
