@@ -3,11 +3,18 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 from django.http import HttpResponse
-
 from .forms import UsuarioForm, PerfilForm
 from .models import Usuario
 from utils.export_excel import queryset_to_excel
 
+# --- 💌 Recuperación de contraseña simplificada con SweetAlert ---
+from .models import Usuario
+from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.core.mail import send_mail
+from django.conf import settings
 
 # 🧑‍💻 PERFIL DEL USUARIO
 @login_required
@@ -150,3 +157,65 @@ def usuario_delete(request, pk):
     u.delete()
     messages.success(request, 'Usuario eliminado.')
     return redirect('usuarios:lista')
+
+
+# 🔑 Recuperación de contraseña personalizada
+
+# 💌 Paso 1: Solicitar correo
+def password_reset_custom(request):
+    """
+    Muestra el formulario para ingresar el correo o usuario y envía el enlace.
+    """
+    if request.method == 'POST':
+        form = PasswordResetForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            user = Usuario.objects.filter(email=email).first()
+            if user:
+                uid = urlsafe_base64_encode(force_bytes(user.pk))
+                token = default_token_generator.make_token(user)
+                reset_link = f"{'https' if request.is_secure() else 'http'}://{request.get_host()}/usuarios/reset/{uid}/{token}/"
+
+                subject = "Restablecer contraseña - Dulcería Lili"
+                message = f"Hola {user.username},\n\nHaz clic en el siguiente enlace para crear una nueva contraseña:\n\n{reset_link}\n\nSi no solicitaste esto, puedes ignorar este mensaje."
+                send_mail(subject, message, settings.EMAIL_HOST_USER, [email])
+
+            # ⚡️ Redirige con parámetro de éxito (aunque el correo no exista)
+            return redirect('/usuarios/password_reset/?sent=true')
+    else:
+        form = PasswordResetForm()
+
+    return render(request, 'usuarios/password_reset.html', {'form': form})
+
+
+# 🔐 Paso 2: Cambiar contraseña
+def password_reset_confirm_custom(request, uidb64, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = Usuario.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user and default_token_generator.check_token(user, token):
+        if request.method == 'POST':
+            form = SetPasswordForm(user, request.POST)
+            if form.is_valid():
+                form.save()
+                # ✅ redirigir a una página nueva, no volver al token
+                return redirect("/usuarios/password_reset_done/?success=true")
+            else:
+                return render(request, 'usuarios/password_reset_confirm.html', {
+                    'form': form,
+                    'error': form.errors
+                })
+        else:
+            form = SetPasswordForm(user)
+        return render(request, 'usuarios/password_reset_confirm.html', {'form': form})
+    else:
+        return render(request, 'usuarios/password_reset_confirm.html', {
+            'error': 'El enlace no es válido o ha expirado.'
+        })
+
+
+def password_reset_done_custom(request):
+    return render(request, 'usuarios/password_reset_done.html')
