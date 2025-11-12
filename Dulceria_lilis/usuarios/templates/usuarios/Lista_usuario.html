@@ -7,14 +7,7 @@
 <div class="container-fluid mt-3 px-0">
   <div class="row g-3 mx-0">
 
-    <!-- ============== MENSAJES ============== -->
-    <div class="col-12">
-      {% if messages %}
-        {% for message in messages %}
-          <div class="alert alert-{{ message.tags }} mb-2">{{ message }}</div>
-        {% endfor %}
-      {% endif %}
-    </div>
+
 
     <!-- ============== FORMULARIO (CREAR) ============== -->
     <div class="col-lg-3 col-md-4">
@@ -38,12 +31,7 @@
               {% for e in form.username.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
             </div>
 
-            <div class="mb-2">
-              <label class="form-label small fw-bold">Password</label>
-              <input type="password" name="password" class="form-control"
-                     value="{{ form.password.value|default:'' }}">
-              {% for e in form.password.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
-            </div>
+
 
             <div class="mb-2">
               <label class="form-label small fw-bold">Email</label>
@@ -116,13 +104,6 @@
               {% for e in form.observaciones.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
             </div>
 
-            <div class="mb-3">
-              <label class="form-label small fw-bold">Último acceso</label>
-              <input type="text" class="form-control"
-                     value="{% if form.instance and form.instance.ultimo_acceso %}{{ form.instance.ultimo_acceso|date:'Y-m-d H:i' }}{% else %}—{% endif %}"
-                     readonly>
-            </div>
-
             <div class="d-grid gap-2">
               <button type="submit" class="btn btn-primary">Guardar</button>
               <button type="reset" class="btn btn-outline-secondary">Limpiar</button>
@@ -149,7 +130,7 @@
           </div>
 
           <!-- Filtros (GET) -->
-          <form method="get" class="row g-2 mb-3" id="filtros">
+          <form method="get" action="{% url 'usuarios:lista' %}" class="row g-2 mb-3" id="filtros">
             <div class="col-md-5">
               <input type="text" name="q" value="{{ f_q }}" class="form-control" placeholder="Buscar por username...">
             </div>
@@ -188,6 +169,7 @@
                   <th>MFA</th>
                   <th>Último acceso</th>
                   <th>Área</th>
+                  <th>Sesiones</th>
                   <th>Acciones</th>
                 </tr>
               </thead>
@@ -213,6 +195,7 @@
                   <td>{% if usuario.mfa_habilitado %}Sí{% else %}No{% endif %}</td>
                   <td>{% if usuario.ultimo_acceso %}{{ usuario.ultimo_acceso|date:"Y-m-d H:i" }}{% else %}—{% endif %}</td>
                   <td>{{ usuario.area|default:"—" }}</td>
+                  <td>{{ usuario.sesiones }}</td>
                   <td>
                     <div class="btn-group btn-group-sm" role="group">
                       <a href="{% url 'usuarios:editar' usuario.pk %}" class="btn btn-warning text-white">
@@ -270,5 +253,6 @@
       }
     });
   }
+  
 </script>
 {% endblock %}

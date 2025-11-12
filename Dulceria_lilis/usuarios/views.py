@@ -43,14 +43,27 @@ def perfil_editar(request):
 def usuario_list(request):
     """
     Lista con filtros (q, rol, estado) y formulario embebido para crear.
-    Además permite exportar los resultados a Excel.
+    Los filtros se guardan en sesión para mantenerlos al recargar.
     """
     qs = Usuario.objects.all().order_by('username')
 
-    q = request.GET.get('q', '').strip()
-    rol = request.GET.get('rol', '').strip()
-    estado = request.GET.get('estado', '').strip()
+    # --- Obtener filtros desde GET o sesión ---
+    q = request.GET.get('q')
+    rol = request.GET.get('rol')
+    estado = request.GET.get('estado')
 
+    # Si el usuario entra sin parámetros, usar los valores guardados en sesión
+    if q is None and rol is None and estado is None:
+        q = request.session.get('f_q', '')
+        rol = request.session.get('f_rol', '')
+        estado = request.session.get('f_estado', '')
+    else:
+        # Actualizar la sesión con los nuevos valores
+        request.session['f_q'] = q or ''
+        request.session['f_rol'] = rol or ''
+        request.session['f_estado'] = estado or ''
+
+    # --- Aplicar filtros ---
     if q:
         qs = qs.filter(username__icontains=q)
     if rol:
@@ -70,6 +83,7 @@ def usuario_list(request):
             ("Área", lambda u: u.area or ""),
             ("MFA habilitado", lambda u: "Sí" if u.mfa_habilitado else "No"),
             ("Último acceso", lambda u: u.last_login.replace(tzinfo=None) if u.last_login else ""),
+            ("Sesiones", lambda u: u.sesiones),
         ]
         raw, fname = queryset_to_excel("usuarios", columns, qs)
         resp = HttpResponse(
@@ -79,15 +93,17 @@ def usuario_list(request):
         resp["Content-Disposition"] = f'attachment; filename="{fname}"'
         return resp
 
-    form = UsuarioForm()  # Form vacío para crear usuario
+    # --- Contexto ---
+    form = UsuarioForm()
     ctx = {
         'usuarios': qs,
         'form': form,
-        'f_q': q,
-        'f_rol': rol,
-        'f_estado': estado,
+        'f_q': q or '',
+        'f_rol': rol or '',
+        'f_estado': estado or '',
     }
     return render(request, 'usuarios/Lista_usuario.html', ctx)
+
 
 
 # ➕ CREAR USUARIO
@@ -193,7 +209,7 @@ def password_reset_confirm_custom(request, uidb64, token):
     try:
         uid = force_str(urlsafe_base64_decode(uidb64))
         user = Usuario.objects.get(pk=uid)
-    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+    except (TypeError, ValueError, OverflowError, Usuario.DoesNotExist):
         user = None
 
     if user and default_token_generator.check_token(user, token):

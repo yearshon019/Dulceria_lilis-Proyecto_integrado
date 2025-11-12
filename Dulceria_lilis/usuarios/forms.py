@@ -22,6 +22,7 @@ class LoginForm(AuthenticationForm):
 # =====================
 class UsuarioForm(forms.ModelForm):
     ROL_CHOICES = [
+        ('', 'Seleccione rol'),  # ← agrega esta línea para permitir opción vacía
         ('ADMIN', 'ADMIN'),
         ('PROVEEDOR', 'PROVEEDOR'),
         ('OPERADOR', 'OPERADOR'),
@@ -33,8 +34,16 @@ class UsuarioForm(forms.ModelForm):
         ('INACTIVO', 'INACTIVO'),
     ]
 
-    rol = forms.ChoiceField(choices=ROL_CHOICES, widget=forms.Select(attrs={'class': 'form-select'}))
-    estado = forms.ChoiceField(choices=ESTADO_CHOICES, widget=forms.Select(attrs={'class': 'form-select'}))
+    rol = forms.ChoiceField(
+        choices=ROL_CHOICES,
+        required=False,  # ← evita el “This field is required.”
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+
+    estado = forms.ChoiceField(
+        choices=ESTADO_CHOICES,
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
 
     class Meta:
         model = Usuario
@@ -68,34 +77,46 @@ class UsuarioForm(forms.ModelForm):
     # =====================
     def clean_email(self):
         email = self.cleaned_data.get('email')
-        if email:
-            email = email.strip()
-            if not email:
-                raise forms.ValidationError("Por favor, ingresa una dirección de correo electrónica.")
-            if '@' not in email:
-                raise forms.ValidationError("Por favor, ingresa una dirección de correo electrónica válida.")
-            if Usuario.objects.filter(email__iexact=email).exclude(pk=getattr(self.instance, 'pk', None)).exists():
-                raise forms.ValidationError("Este correo electrónica ya está registrado.")
-            if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email):
-                raise forms.ValidationError("Por favor, ingresa una dirección de correo electrónica válida.")
+
+        # Si está vacío → error inmediato
+        if not email or not email.strip():
+            raise forms.ValidationError("Por favor, ingresa una dirección de correo electrónica.")
+
+        email = email.strip()
+
+        # Validación de formato básico
+        if '@' not in email:
+            raise forms.ValidationError("Por favor, ingresa una dirección de correo electrónica válida.")
+
+        # Validación de duplicado (excluyendo el usuario actual si se está editando)
+        if Usuario.objects.filter(email__iexact=email).exclude(pk=getattr(self.instance, 'pk', None)).exists():
+            raise forms.ValidationError("Este correo electrónico ya está registrado.")
+
+        # Validación de regex (formato correcto)
+        if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email):
+            raise forms.ValidationError("Por favor, ingresa una dirección de correo electrónica válida.")
+
         return email
+
 
     def clean_telefono(self):
         telefono = self.cleaned_data.get('telefono')
-        if telefono:
-            telefono = telefono.strip()
-            if not telefono:
-                raise forms.ValidationError("Por favor, ingresa un teléfono.")
-            if not telefono.isdigit():
-                raise forms.ValidationError("El teléfono debe contener solo números.")
-            if len(telefono) != 9:
-                raise forms.ValidationError("El teléfono debe tener exactamente 9 dígitos.")
-            if re.match(r'^(\d)\1{8,}$', telefono):
-                raise forms.ValidationError(f"El teléfono no debe contener secuencias repetidas como {telefono[0] * 9}.")
+        if not telefono:
+            raise forms.ValidationError("Por favor, ingresa un teléfono.")
+        telefono = telefono.strip()
+
+        if not telefono.isdigit():
+            raise forms.ValidationError("El teléfono debe contener solo números.")
+        if len(telefono) != 9:
+            raise forms.ValidationError("El teléfono debe tener exactamente 9 dígitos.")
+        if re.match(r'^(\d)\1{8,}$', telefono):
+            raise forms.ValidationError(f"El teléfono no debe contener secuencias repetidas como {telefono[0] * 9}.")
         return telefono
 
     def clean_username(self):
         username = self.cleaned_data.get('username')
+        if len(username) > 20:
+            raise forms.ValidationError("El nombre de usuario no puede exceder los 20 caracteres.")
         if username and not username.isalnum():
             raise forms.ValidationError("El nombre de usuario debe contener solo caracteres alfanuméricos.")
         return username
@@ -104,8 +125,8 @@ class UsuarioForm(forms.ModelForm):
         nombres = self.cleaned_data.get('nombres')
         if not nombres or not nombres.strip():
             raise forms.ValidationError("Por favor, ingresa tu nombre.")
-        if len(nombres) > 100:
-            raise forms.ValidationError("El nombre no puede exceder los 100 caracteres.")
+        if len(nombres) > 50:
+            raise forms.ValidationError("El nombre no puede exceder los 50 caracteres.")
         if not nombres.isalpha():
             raise forms.ValidationError("El nombre debe contener solo letras.")
         return nombres
@@ -116,9 +137,23 @@ class UsuarioForm(forms.ModelForm):
             raise forms.ValidationError("Por favor, ingresa tus apellidos.")
         if len(apellidos) > 100:
             raise forms.ValidationError("Los apellidos no pueden exceder los 100 caracteres.")
-        if not apellidos.isalpha():
+        if not re.match(r'^[A-Za-zÁÉÍÓÚáéíóúÑñ\s-]+$', apellidos):
             raise forms.ValidationError("Los apellidos deben contener solo letras.")
         return apellidos
+    
+    def clean_rol(self):
+        rol = (self.cleaned_data.get('rol') or '').strip()
+        if not rol:
+            raise forms.ValidationError("Por favor, selecciona un rol.")
+        return rol
+
+    def clean_estado(self):
+        estado = (self.cleaned_data.get('estado') or '').strip()
+        if not estado:
+            raise forms.ValidationError("Por favor, selecciona un estado.")
+        return estado
+
+
 
 # =====================
 # PERFIL FORM
@@ -162,3 +197,5 @@ class PerfilForm(forms.ModelForm):
         if ctype and ctype.lower() not in ALLOWED_IMAGE_CONTENT_TYPES:
             raise ValidationError("Formato no permitido. Usa JPG, PNG o WEBP.")
         return file
+    
+

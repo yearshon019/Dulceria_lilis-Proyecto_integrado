@@ -19,7 +19,6 @@ urlpatterns = [
     path('perfil/editar/', views.perfil_editar, name='perfil_editar'),
 
     # 👥 CRUD de usuarios
-    path('', views.usuario_list, name='lista_usuarios'),
     path('', views.usuario_list, name='lista'),  # Alias
     path('crear/', views.usuario_create, name='crear'),
     path('<int:pk>/editar/', views.usuario_update, name='editar'),
