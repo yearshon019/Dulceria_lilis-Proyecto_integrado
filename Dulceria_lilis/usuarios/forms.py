@@ -125,8 +125,8 @@ class UsuarioForm(forms.ModelForm):
         nombres = self.cleaned_data.get('nombres')
         if not nombres or not nombres.strip():
             raise forms.ValidationError("Por favor, ingresa tu nombre.")
-        if len(nombres) > 50:
-            raise forms.ValidationError("El nombre no puede exceder los 50 caracteres.")
+        if len(nombres) > 20:
+            raise forms.ValidationError("El nombre no puede exceder los 20 caracteres.")
         if not nombres.isalpha():
             raise forms.ValidationError("El nombre debe contener solo letras.")
         return nombres
@@ -135,8 +135,8 @@ class UsuarioForm(forms.ModelForm):
         apellidos = self.cleaned_data.get('apellidos')
         if not apellidos or not apellidos.strip():
             raise forms.ValidationError("Por favor, ingresa tus apellidos.")
-        if len(apellidos) > 100:
-            raise forms.ValidationError("Los apellidos no pueden exceder los 100 caracteres.")
+        if len(apellidos) > 40:
+            raise forms.ValidationError("Los apellidos no pueden exceder los 40 caracteres.")
         if not re.match(r'^[A-Za-zÁÉÍÓÚáéíóúÑñ\s-]+$', apellidos):
             raise forms.ValidationError("Los apellidos deben contener solo letras.")
         return apellidos
