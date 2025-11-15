@@ -19,20 +19,37 @@
     </div>
   </div>
 
+  <!-- TABLA CON BUSCADOR INTEGRADO -->
+  <div class="card shadow-sm mb-5">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+  
+  
+        <!-- Buscador -->
+        <form method="get" action="{% url 'proveedores:lista' %}" class="d-flex" id ="buscador" style="max-width: 400px;">
+          <input type="text" name="buscar_Rut_Nif" class="form-control form-control-sm me-2"
+                 placeholder="Buscar por rut_nif o razon_social"
+                 value="{{ buscar_Rut_Nif|default_if_none:'' }}"
+                 autocomplete="off">
+          <button type="submit" class="btn btn-sm btn-primary">
+            <i class="bi bi-search"></i>
+          </button>
+        </form>
+      </div>
+
   <!-- TABLA -->
   <div class="card shadow-sm mb-5">
     <div class="card-body">
       {% if proveedores %}
       <div class="table-responsive">
         <table class="table table-hover align-middle">
-          <thead class="table-primary">
+          <thead class="table-danger">
             <tr>
               <th>RUT/NIF</th>
               <th>Razón social</th>
-              <th>Email</th>
-              <th>Teléfono</th>
-              <th>Ciudad</th>
               <th>Estado</th>
+              <th>Email</th>
+
               <th class="text-center">Acciones</th>
             </tr>
           </thead>
@@ -41,10 +58,6 @@
             <tr>
               <td>{{ p.rut_nif }}</td>
               <td>{{ p.razon_social }}</td>
-              <td>{{ p.email|default:"—" }}</td>
-              <td>{{ p.telefono|default:"—" }}</td>
-              <td>{{ p.ciudad|default:"—" }}</td>
-
               <td>
                 {% if p.estado == 'ACTIVO' %}
                   <span class="badge bg-success">ACTIVO</span>
@@ -54,6 +67,7 @@
                   <span class="badge bg-secondary">{{ p.estado }}</span>
                 {% endif %}
               </td>
+              <td>{{ p.email|default:"—" }}</td>
 
               <td class="text-center">
                 <a href="{% url 'proveedores:editar' p.id %}" class="btn btn-sm btn-warning" title="Editar">

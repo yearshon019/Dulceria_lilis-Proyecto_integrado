@@ -31,11 +31,6 @@
           <p><strong>País:</strong> {{ object.pais|default:"—" }}</p>
           <p><strong>Condiciones de Pago:</strong> {{ object.condiciones_pago|default:"—" }}</p>
           <p><strong>Moneda:</strong> {{ object.moneda|default:"—" }}</p>
-          <p><strong>Contacto Principal:</strong>
-            {{ object.contacto_principal_nombre|default:"—" }}
-            ({{ object.contacto_principal_email|default:"—" }},
-             {{ object.contacto_principal_telefono|default:"—" }})
-          </p>
           <p>
             <strong>Estado:</strong>
             {% if object.estado == "ACTIVO" %}

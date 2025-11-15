@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.utils.decorators import method_decorator
 from django.http import HttpResponse
-
+from django.db.models import Q
 from .models import Proveedor, ProductoProveedor, Producto
 from .forms import ProveedorForm, ProductoProveedorFormSet, ProductoRelacionForm
 from sistema.decorators import permiso_requerido
@@ -22,7 +22,14 @@ class ProveedorListView(ListView):
     ordering = ['razon_social']
 
     def get_queryset(self):
-        qs = super().get_queryset().order_by('razon_social')
+        buscar_Rut_Nif = self.request.GET.get("buscar_Rut_Nif")
+        if buscar_Rut_Nif is None:
+            buscar_Rut_Nif = self.request.session.get('f_buscar_Rut_Nif', '')
+        else:
+            self.request.session["f_buscar_Rut_Nif"] = buscar_Rut_Nif
+        qs = Proveedor.objects.all().order_by('rut_nif', 'razon_social')
+        if buscar_Rut_Nif:
+            qs = qs.filter(Q(rut_nif__icontains=buscar_Rut_Nif) | Q(razon_social__icontains=buscar_Rut_Nif))
         return qs
 
     def get(self, request, *args, **kwargs):
@@ -61,6 +68,9 @@ class ProveedorListView(ListView):
 
         # 🔹 Enviar listado de productos para el select
         ctx["productos"] = Producto.objects.all().order_by("nombre")
+
+        # 🔹 Enviar filtros para mantenerlos al recargar
+        ctx["buscar_Rut_Nif"] = self.request.session.get('f_buscar_Rut_Nif', '')
 
         # 🔹 Enviar formset vacío para usar en el HTML
         ctx["pp_formset"] = ProductoProveedorFormSet()
