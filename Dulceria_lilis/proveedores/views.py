@@ -6,8 +6,8 @@ from django.contrib import messages
 from django.utils.decorators import method_decorator
 from django.http import HttpResponse
 
-from .models import Proveedor, ProductoProveedor
-from .forms import ProveedorForm, ProductoProveedorFormSet
+from .models import Proveedor, ProductoProveedor, Producto
+from .forms import ProveedorForm, ProductoProveedorFormSet, ProductoRelacionForm
 from sistema.decorators import permiso_requerido
 from utils.export_excel import queryset_to_excel
 
@@ -54,30 +54,80 @@ class ProveedorListView(ListView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        if 'form' not in ctx:
-            ctx['form'] = ProveedorForm()
-        ctx['titulo'] = 'Registrar proveedor'
+
+        # Formulario principal
+        if "form" not in ctx:
+            ctx["form"] = ProveedorForm()
+
+        # 🔹 Enviar listado de productos para el select
+        ctx["productos"] = Producto.objects.all().order_by("nombre")
+
+        # 🔹 Enviar formset vacío para usar en el HTML
+        ctx["pp_formset"] = ProductoProveedorFormSet()
+
+        # Si viene desde POST, úsalo. Si no, crea uno vacío.
+        if "rel_form" not in ctx:
+            ctx["rel_form"] = ProductoRelacionForm()
+
+        ctx["titulo"] = "Registrar proveedor"
         return ctx
 
     def post(self, request, *args, **kwargs):
         form = ProveedorForm(request.POST)
+        rel_form = ProductoRelacionForm(request.POST)
 
+        # ---------- VALIDACIÓN DEL FORM PRINCIPAL ----------
         if form.is_valid():
             rut = form.cleaned_data.get('rut_nif')
             email = form.cleaned_data.get('email')
+
             if Proveedor.objects.filter(rut_nif=rut).exists():
                 form.add_error('rut_nif', 'Ya existe un proveedor con este RUT/NIF.')
+
             if Proveedor.objects.filter(email=email).exists():
                 form.add_error('email', 'Ya existe un proveedor con este correo electrónico.')
 
+        # Si hubo errores → recargar
         if form.errors:
             messages.error(request, 'Por favor complete todos los campos obligatorios correctamente.')
             self.object_list = self.get_queryset()
             context = self.get_context_data()
-            context['form'] = form
+            context["form"] = form
+            context["rel_form"] = rel_form  # ⭐ AGREGADO
             return self.render_to_response(context)
 
-        form.save()
+        # ======================================================
+        # VALIDAR TAB 3 CON EL FORM ProductoRelacionForm
+        # ======================================================
+        if not rel_form.is_valid():
+            messages.error(request, "Corrige los errores del TAB 3.")
+            self.object_list = self.get_queryset()
+            context = self.get_context_data()
+            context["form"] = form
+            context["rel_form"] = rel_form  # ⭐ AGREGADO
+            return self.render_to_response(context)
+
+        # ======================================================
+        # GUARDAR PROVEEDOR
+        # ======================================================
+        proveedor = form.save()
+
+        # ======================================================
+        # GUARDAR TAB 3 (solo si eligieron producto)
+        # ======================================================
+        producto = rel_form.cleaned_data.get("producto_rel")
+
+        if producto:
+            ProductoProveedor.objects.create(
+                proveedor=proveedor,
+                producto=producto,
+                costo=rel_form.cleaned_data.get("costo_rel"),
+                lead_time_dias=rel_form.cleaned_data.get("lead_time_rel"),
+                min_lote=rel_form.cleaned_data.get("min_lote_rel"),
+                descuento_pct=rel_form.cleaned_data.get("descuento_rel") or 0,
+                preferente=rel_form.cleaned_data.get("preferente_rel") or False,
+            )
+
         messages.success(request, 'Proveedor creado correctamente.')
         return redirect('proveedores:lista')
 
@@ -110,6 +160,7 @@ class ProveedorCreateView(CreateView):
         return render(self.request, 'proveedores/lista_proveedor.html', context)
 
 
+
 # ----------------------------------------------------------
 # EDITAR PROVEEDOR
 # ----------------------------------------------------------
@@ -121,10 +172,16 @@ class ProveedorUpdateView(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        # FORMSET: Carga y edición de productos asociados
         if self.request.POST:
             context["pp_formset"] = ProductoProveedorFormSet(self.request.POST, instance=self.object)
         else:
             context["pp_formset"] = ProductoProveedorFormSet(instance=self.object)
+
+        # Productos para el select
+        context["productos"] = Producto.objects.all()
+
         context['titulo'] = 'Editar'
         return context
 
@@ -133,18 +190,44 @@ class ProveedorUpdateView(UpdateView):
         pp_formset = context["pp_formset"]
 
         if pp_formset.is_valid():
+
+            # Guardar el proveedor
             self.object = form.save()
+
+            # Guardar cambios del formset (edición y eliminación)
             pp_formset.instance = self.object
             pp_formset.save()
-            messages.success(self.request, "Proveedor y productos asociados guardados correctamente.")
-            return redirect(self.get_success_url())
-        else:
-            return render(self.request, self.template_name, self.get_context_data(form=form))
 
-    def form_invalid(self, form):
-        if form.errors:
-            messages.error(self.request, 'Por favor, corrija los errores.')
+            # --- AGREGAR NUEVA RELACIÓN ---
+            prod_id = self.request.POST.get("producto_rel")
+
+            if prod_id:
+                producto = Producto.objects.get(pk=prod_id)
+
+                # Prevenir duplicados
+                ya_existe = ProductoProveedor.objects.filter(
+                    proveedor=self.object,
+                    producto=producto
+                ).exists()
+
+                if not ya_existe:
+                    ProductoProveedor.objects.create(
+                        proveedor=self.object,
+                        producto=producto,
+                        costo=self.request.POST.get("costo_rel") or 0,
+                        lead_time_dias=self.request.POST.get("lead_time_rel") or 7,
+                        min_lote=self.request.POST.get("min_lote_rel") or 1,
+                        descuento_pct=self.request.POST.get("descuento_rel") or 0,
+                        preferente=True if self.request.POST.get("preferente_rel") == "on" else False,
+                    )
+
+            # 🔥 SIEMPRE REDIRIGIR DESPUÉS DE GUARDAR
+            messages.success(self.request, "Cambios guardados correctamente.")
+            return redirect(self.get_success_url())
+
+        # Si el formset tiene errores
         return render(self.request, self.template_name, self.get_context_data(form=form))
+
 
 
 # ----------------------------------------------------------

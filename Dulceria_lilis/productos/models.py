@@ -1,4 +1,6 @@
 from django.db import models
+from datetime import date, timedelta
+
 
 class Producto(models.Model):
     sku = models.CharField(max_length=50, unique=True)
@@ -28,9 +30,22 @@ class Producto(models.Model):
     ficha_tecnica_url = models.URLField(blank=True, null=True)
 
     stock_actual = models.DecimalField(max_digits=12, decimal_places=2, default=0)
-
+    fecha_vencimiento = models.DateField(blank=True, null=True)
     def alerta_bajo_stock(self):
+        """Devuelve True si el stock actual está por debajo del punto de reorden o mínimo."""
         return self.stock_actual <= (self.punto_reorden or self.stock_minimo)
+    
+    def alerta_por_vencer(self):
+        """Devuelve True si el producto perecible vence en los próximos 7 días."""
+        if self.perishable and self.fecha_vencimiento:
+            return self.fecha_vencimiento <= date.today() + timedelta(days=7)
+        return False
+
+    def save(self, *args, **kwargs):
+        """Asegura que punto_reorden tenga valor por defecto igual al stock_minimo."""
+        if self.punto_reorden is None:
+            self.punto_reorden = self.stock_minimo
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.sku} - {self.nombre}"

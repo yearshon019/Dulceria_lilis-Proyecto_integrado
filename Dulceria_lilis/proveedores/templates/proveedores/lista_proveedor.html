@@ -11,16 +11,15 @@
     <h2 class="fw-bold text-primary">
       <i class="bi bi-building"></i> Lista de Proveedores
     </h2>
+
     <div class="col-md-2 d-grid">
-  <a class="btn btn-success"
-     href="?export=xlsx">
-    <i class="bi bi-file-earmark-excel"></i> Exportar Excel
-  </a>
-</div>
+      <a class="btn btn-success" href="?export=xlsx">
+        <i class="bi bi-file-earmark-excel"></i> Exportar Excel
+      </a>
+    </div>
   </div>
 
-
-  <!-- Tabla de proveedores -->
+  <!-- TABLA -->
   <div class="card shadow-sm mb-5">
     <div class="card-body">
       {% if proveedores %}
@@ -45,6 +44,7 @@
               <td>{{ p.email|default:"—" }}</td>
               <td>{{ p.telefono|default:"—" }}</td>
               <td>{{ p.ciudad|default:"—" }}</td>
+
               <td>
                 {% if p.estado == 'ACTIVO' %}
                   <span class="badge bg-success">ACTIVO</span>
@@ -54,70 +54,76 @@
                   <span class="badge bg-secondary">{{ p.estado }}</span>
                 {% endif %}
               </td>
+
               <td class="text-center">
                 <a href="{% url 'proveedores:editar' p.id %}" class="btn btn-sm btn-warning" title="Editar">
                   <i class="bi bi-pencil-square"></i>
                 </a>
+
                 <button onclick="confirmarEliminacion('{{ p.id }}')" class="btn btn-sm btn-danger" title="Eliminar">
                   <i class="bi bi-trash"></i>
                 </button>
-                </a>
+
                 <a href="{% url 'proveedores:detalle' p.id %}" class="btn btn-sm btn-info" title="Detalle">
                   <i class="bi bi-info-circle"></i>
                 </a>
+
               </td>
             </tr>
             {% endfor %}
           </tbody>
         </table>
       </div>
+
       {% else %}
         <div class="alert alert-info mb-0">No hay proveedores registrados.</div>
       {% endif %}
     </div>
   </div>
 
-  <!-- Formulario embebido: Registrar proveedor -->
+  <!-- FORMULARIO EMBEBIDO -->
   <div class="card shadow-sm">
     <div class="card-header text-white" style="background-color:#c62828;">
       <div class="d-flex justify-content-between align-items-center">
         <h4 class="mb-0"><i class="bi bi-person-plus"></i> Formulario de Proveedor</h4>
-        <img src="{% static 'img/logo.png' %}" alt="Logo Dulcería Lili" width="40" height="40">
+        <img src="{% static 'img/logo.png' %}" width="40" height="40">
       </div>
     </div>
 
     <div class="card-body bg-light">
 
       {% if form.non_field_errors %}
-        <div class="alert alert-danger mb-3">
-          {% for e in form.non_field_errors %}{{ e }}<br>{% endfor %}
-        </div>
+      <div class="alert alert-danger mb-3">
+        {% for e in form.non_field_errors %}{{ e }}<br>{% endfor %}
+      </div>
       {% endif %}
-      
-      <!-- Pestañas -->
+
+      <!-- PESTAÑAS -->
       <ul class="nav nav-tabs mb-3" id="provTabs" role="tablist">
-        <li class="nav-item" role="presentation">
-          <button class="nav-link active" id="tab-ident" data-bs-toggle="tab" data-bs-target="#pane-ident" type="button" role="tab">
-            1. Identificación y contacto
+        <li class="nav-item">
+          <button class="nav-link active" id="tab-ident" data-bs-toggle="tab" data-bs-target="#pane-ident">
+            1. Identificación & Contacto
           </button>
         </li>
-        <li class="nav-item" role="presentation">
-          <button class="nav-link" id="tab-comercial" data-bs-toggle="tab" data-bs-target="#pane-comercial" type="button" role="tab">
-            2. Dirección y comercial
+
+        <li class="nav-item">
+          <button class="nav-link" id="tab-comercial" data-bs-toggle="tab" data-bs-target="#pane-comercial">
+            2. Dirección & Comercial
           </button>
         </li>
-        <li class="nav-item" role="presentation">
-          <button class="nav-link" id="tab-relacion" data-bs-toggle="tab" data-bs-target="#pane-relacion" type="button" role="tab">
-            3. Relación con productos
+
+        <li class="nav-item">
+          <button class="nav-link" id="tab-relacion" data-bs-toggle="tab" data-bs-target="#pane-relacion">
+            3. Relación con Productos
           </button>
         </li>
       </ul>
 
-      <form method="post" action="{% url 'proveedores:lista' %}" novalidate>
+      <form method="post"  novalidate>
         {% csrf_token %}
         <div class="tab-content">
 
-          <!-- 1) Identificación y contacto -->
+          <!-- ========== TAB 1 ========== -->
           <div class="tab-pane fade show active" id="pane-ident" role="tabpanel" aria-labelledby="tab-ident">
             <div class="row g-3">
               <div class="col-md-6">
@@ -153,71 +159,112 @@
             </div>
           </div>
 
-          <!-- 2) Dirección y comercial -->
-          <div class="tab-pane fade" id="pane-comercial" role="tabpanel" aria-labelledby="tab-comercial">
+          <!-- ========== TAB 2 ========== -->
+          <div class="tab-pane fade" id="pane-comercial">
             <div class="row g-3">
+
               <div class="col-md-6">
                 <label class="form-label">Dirección</label>
                 {{ form.direccion }}
                 {% for e in form.direccion.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
               </div>
+
               <div class="col-md-3">
                 <label class="form-label">Ciudad</label>
                 {{ form.ciudad }}
                 {% for e in form.ciudad.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
               </div>
+
               <div class="col-md-3">
                 <label class="form-label">País</label>
                 {{ form.pais }}
                 {% for e in form.pais.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
               </div>
+
               <div class="col-md-4">
-                <label class="form-label">Condiciones de pago</label>
+                <label class="form-label">Condiciones de Pago *</label>
                 {{ form.condiciones_pago }}
-                {% for e in form.condiciones_pago.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+                {%  for e in form.condiciones_pago.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
               </div>
+
               <div class="col-md-4">
-                <label class="form-label">Moneda</label>
+                <label class="form-label">Moneda *</label>
                 {{ form.moneda }}
                 {% for e in form.moneda.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
               </div>
+
               <div class="col-md-4">
                 <label class="form-label">Estado</label>
                 {{ form.estado }}
-                {% for e in form.estado.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+                {%  for e in form.estado.errors %}<div class="text-danger small">{{ e }}</div>{% endfor  %}
               </div>
+
             </div>
           </div>
 
-          <!-- 3) Relación con productos / Contacto principal -->
-          <div class="tab-pane fade" id="pane-relacion" role="tabpanel" aria-labelledby="tab-relacion">
+          <!-- ========== TAB 3 ========== -->
+          <div class="tab-pane fade" id="pane-relacion">
+
+            <h5 class="fw-bold text-secondary">Relación con Productos</h5>
+            <div class="alert alert-info">
+              Asocia este proveedor a un producto, registrando costo, lead time y si es preferente.
+            </div>
+          
             <div class="row g-3">
+          
               <div class="col-md-4">
-                <label class="form-label">Contacto principal (nombre)</label>
-                {{ form.contacto_principal_nombre }}
-                {% for e in form.contacto_principal_nombre.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+                <label class="form-label">Producto</label>
+                {{ rel_form.producto_rel }}
+                {% for e in rel_form.producto_rel.errors %}
+                    <div class="text-danger small">{{ e }}</div>
+                {% endfor %}
               </div>
+          
               <div class="col-md-4">
-                <label class="form-label">Contacto principal (email)</label>
-                {{ form.contacto_principal_email }}
-                {% for e in form.contacto_principal_email.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+                <label class="form-label">Costo</label>
+                {{ rel_form.costo_rel }}
+                {% for e in rel_form.costo_rel.errors %}
+                    <div class="text-danger small">{{ e }}</div>
+                {% endfor %}
               </div>
+          
               <div class="col-md-4">
-                <label class="form-label">Contacto principal (teléfono)</label>
-                {{ form.contacto_principal_telefono }}
-                {% for e in form.contacto_principal_telefono.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+                <label class="form-label">Lead Time (días)</label>
+                {{ rel_form.lead_time_rel }}
+                {% for e in rel_form.lead_time_rel.errors %}
+                    <div class="text-danger small">{{ e }}</div>
+                {% endfor %}
               </div>
-              <div class="col-12">
-                <label class="form-label">Observaciones</label>
-                {{ form.observaciones }}
-                {% for e in form.observaciones.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+          
+              <div class="col-md-4">
+                <label class="form-label">Min Lote</label>
+                {{ rel_form.min_lote_rel }}
+                {% for e in rel_form.min_lote_rel.errors %}
+                    <div class="text-danger small">{{ e }}</div>
+                {% endfor %}
               </div>
+          
+              <div class="col-md-4">
+                <label class="form-label">Descuento (%)</label>
+                {{ rel_form.descuento_rel }}
+                {% for e in rel_form.descuento_rel.errors %}
+                    <div class="text-danger small">{{ e }}</div>
+                {% endfor %}
+              </div>
+          
+              <div class="col-md-4 form-check mt-4 pt-2">
+                {{ rel_form.preferente_rel }}
+                <label class="form-check-label">Proveedor preferente</label>
+              </div>
+          
             </div>
           </div>
+          
+
 
         </div>
 
-        <!-- Acciones -->
+        <!-- ACCIONES -->
         <div class="d-flex justify-content-end mt-4">
           <button type="reset" class="btn btn-secondary me-2">
             <i class="bi bi-eraser"></i> Limpiar
@@ -226,12 +273,14 @@
             <i class="bi bi-save"></i> Guardar
           </button>
         </div>
+
       </form>
     </div>
   </div>
 
 </div>
-<!-- SweetAlert2 para eliminar -->
+
+<!-- Confirmación SweetAlert -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 function confirmarEliminacion(id) {
@@ -242,7 +291,7 @@ function confirmarEliminacion(id) {
     showCancelButton: true,
     confirmButtonText: 'Sí, eliminar',
     cancelButtonText: 'Cancelar'
-  }).then((r) => { if (r.isConfirmed) window.location.href = `/proveedores/${id}/eliminar/`; });
+  }).then((res) => { if (res.isConfirmed) window.location.href = `/proveedores/${id}/eliminar/`; })
 }
 </script>
 

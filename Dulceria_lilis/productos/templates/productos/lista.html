@@ -17,55 +17,80 @@
   </a>
 </div>
   </div>
+  
+  <!-- TABLA CON BUSCADOR INTEGRADO -->
+<div class="card shadow-sm mb-5">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-center mb-3">
 
 
-  <!-- Tabla -->
-  <div class="card shadow-sm mb-5">
-    <div class="card-body">
-      {% if productos %}
-      <div class="table-responsive">
-        <table class="table table-hover align-middle">
-          <thead class="table-primary">
-            <tr>
-              <th>SKU</th>
-              <th>Nombre</th>
-              <th>Categoría</th>
-              <th>Precio venta</th>
-              <th>Stock actual</th>
-              <th>IVA</th>
-              <th class="text-center">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for pr in productos %}
-            <tr>
-              <td>{{ pr.sku }}</td>
-              <td>{{ pr.nombre }}</td>
-              <td>{{ pr.categoria }}</td>
-              <td>${{ pr.precio_venta|default:0|floatformat:0 }}</td>
-              <td>{{ pr.stock_actual }}</td>
-              <td>{{ pr.impuesto_iva }}%</td>
-              <td class="text-center">
-                <a href="{% url 'productos:editar' pr.pk %}" class="btn btn-sm btn-warning" title="Editar">
-                  <i class="bi bi-pencil-square"></i>
-                </a>
-                <a href="{% url 'productos:detalle' pr.pk %}" class="btn btn-sm btn-info" title="Detalle">
-                  <i class="bi bi-info-circle"></i>
-                </a>
-                <button onclick="confirmarEliminacion('{{ pr.pk }}')" class="btn btn-sm btn-danger" title="Eliminar">
-                  <i class="bi bi-trash"></i>
-                </button>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-      {% else %}
-        <div class="alert alert-info mb-0">No hay productos registrados.</div>
-      {% endif %}
+      <!-- Buscador -->
+      <form method="get" action="{% url 'productos:lista' %}" class="d-flex" id ="buscador" style="max-width: 400px;">
+        <input type="text" name="buscar" class="form-control form-control-sm me-2"
+               placeholder="Buscar por SKU o nombre"
+               value="{{ buscar|default_if_none:'' }}"
+               autocomplete="off">
+        <button type="submit" class="btn btn-sm btn-primary">
+          <i class="bi bi-search"></i>
+        </button>
+      </form>
     </div>
+
+
+
+    <!-- Tabla -->
+    {% if productos %}
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-danger">
+          <tr>
+            <th>SKU</th>
+            <th>Nombre</th>
+            <th>Stock actual</th>
+            <th class="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for pr in productos %}
+          <tr>
+            <td>{{ pr.sku }}</td>
+            <td>{{ pr.nombre }}</td>
+            <td>
+              {% if pr.alerta_bajo_stock %}
+                <span class="text-danger fw-bold">{{ pr.stock_actual }}</span>
+              {% else %}
+                {{ pr.stock_actual }}
+              {% endif %}
+            </td>
+            <td class="text-center">
+              <a href="{% url 'productos:editar' pr.pk %}" class="btn btn-sm btn-warning" title="Editar">
+                <i class="bi bi-pencil-square"></i>
+              </a>
+              <a href="{% url 'productos:detalle' pr.pk %}" class="btn btn-sm btn-info" title="Detalle">
+                <i class="bi bi-info-circle"></i>
+              </a>
+              <button onclick="confirmarEliminacion('{{ pr.pk }}')" class="btn btn-sm btn-danger" title="Eliminar">
+                <i class="bi bi-trash"></i>
+              </button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+    </div>
+    {% else %}
+      {% if busqueda_activa %}
+        <div class="alert alert-warning mb-0">
+          No se encontraron productos para la búsqueda: <strong>{{ buscar }}</strong>
+        </div>
+      {% else %}
+      <div class="alert alert-info mb-0">No hay productos registrados.</div>
+    {% endif %}
+    {% endif %}
   </div>
+</div>
+
 
   <!-- 🧾 Formulario embebido -->
   <div class="card shadow-sm">
@@ -136,7 +161,17 @@
             <div class="row g-3">
               <div class="col-md-6">{{ form.imagen_url.label_tag }} {{ form.imagen_url }}</div>
               <div class="col-md-6">{{ form.ficha_tecnica_url.label_tag }} {{ form.ficha_tecnica_url }}</div>
-              <div class="col-12">{{ form.stock_actual.label_tag }} {{ form.stock_actual }}</div>
+              <div class="col-md-6">{{ form.stock_actual.label_tag }} {{ form.stock_actual }}</div>
+              <div class="col-md-6">
+                <label class="form-label"> alerta bajo stock </label>
+                <input type="text" class="form-control" value="{% if form.instance.alerta_bajo_stock %}Sí{% else %}No{% endif %}" readonly>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Alerta Por Vencer</label>
+                <input type="text" class="form-control" 
+                       value="{% if form.instance.alerta_por_vencer %}Sí{% else %}No{% endif %}" readonly>
+              </div>
+
             </div>
           </div>
 

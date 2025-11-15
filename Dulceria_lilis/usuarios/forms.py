@@ -10,17 +10,37 @@ import re
 class LoginForm(AuthenticationForm):
     username = forms.CharField(
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Usuario o email'}),
-        label="Usuario o email"
+        label="Usuario o email",
+        required=False
     )
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Contraseña'}),
-        label="Contraseña"
+        label="Contraseña",
+        required=False
     )
+    error_messages = {
+        'invalid_login': 'usuario o contraseña incorrectos.',
+        'inactive': 'Esta cuenta esta inactiva.',
+    }
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        if not username or not username.strip():
+            raise ValidationError("Por favor, ingresa un usuario o email.")
+        username = username.strip()
+        return username 
+    
+    def clean_password(self):
+        password = self.cleaned_data.get('password')
+        if not password or not password.strip():
+            raise ValidationError("Por favor, ingresa una contraseña.")
+        password = password.strip()
+        return password
 
 # =====================
 # USUARIO FORM
 # =====================
 class UsuarioForm(forms.ModelForm):
+
     ROL_CHOICES = [
         ('', 'Seleccione rol'),  # ← agrega esta línea para permitir opción vacía
         ('ADMIN', 'ADMIN'),
@@ -44,6 +64,7 @@ class UsuarioForm(forms.ModelForm):
         choices=ESTADO_CHOICES,
         widget=forms.Select(attrs={'class': 'form-select'})
     )
+    email = forms.CharField(required=False, widget=forms.EmailInput(attrs={'class': 'form-control'}))
 
     class Meta:
         model = Usuario
@@ -78,25 +99,27 @@ class UsuarioForm(forms.ModelForm):
     def clean_email(self):
         email = self.cleaned_data.get('email')
 
-        # Si está vacío → error inmediato
+    # Si está vacío → error inmediato
         if not email or not email.strip():
             raise forms.ValidationError("Por favor, ingresa una dirección de correo electrónica.")
 
         email = email.strip()
 
-        # Validación de formato básico
+    # Validación de formato básico
         if '@' not in email:
-            raise forms.ValidationError("Por favor, ingresa una dirección de correo electrónica válida.")
+            raise forms.ValidationError("El correo electrónico debe incluir el símbolo '@'.")
+
+    # Validación de regex (formato correcto)
+        patron = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'
+        if not re.match(patron, email):
+            raise forms.ValidationError("El formato del correo electrónico no es válido. Ejemplo: usuario@dominio.com.")
 
         # Validación de duplicado (excluyendo el usuario actual si se está editando)
         if Usuario.objects.filter(email__iexact=email).exclude(pk=getattr(self.instance, 'pk', None)).exists():
             raise forms.ValidationError("Este correo electrónico ya está registrado.")
 
-        # Validación de regex (formato correcto)
-        if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email):
-            raise forms.ValidationError("Por favor, ingresa una dirección de correo electrónica válida.")
-
         return email
+
 
 
     def clean_telefono(self):

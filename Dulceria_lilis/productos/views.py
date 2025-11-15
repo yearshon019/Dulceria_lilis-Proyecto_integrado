@@ -5,14 +5,14 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.utils.decorators import method_decorator
 from django.http import HttpResponse
-
+from django.db.models import Q
 from sistema.decorators import permiso_requerido
 from .models import Producto
 from .forms import ProductoForm
 from utils.export_excel import queryset_to_excel
 
 # ------------------------------
-# LISTAR PRODUCTOS
+# LISTAR PRODUCTOS (con buscar y exportar)
 # ------------------------------
 @method_decorator(permiso_requerido('productos.view_producto'), name='dispatch')
 class ProductoListView(ListView):
@@ -22,7 +22,16 @@ class ProductoListView(ListView):
     ordering = ['nombre']
 
     def get_queryset(self):
-        return super().get_queryset().order_by('nombre')
+        buscar = self.request.GET.get("buscar")
+        if buscar is None:
+            buscar = self.request.session.get('f_buscar', '')
+        else:
+            self.request.session["f_buscar"] = buscar
+        qs = Producto.objects.all().order_by('nombre')
+        if buscar:
+            qs = qs.filter(Q(sku__icontains=buscar) | Q(nombre__icontains=buscar))
+        return qs
+    
 
     def get(self, request, *args, **kwargs):
         if request.GET.get("export") == "xlsx":
@@ -61,6 +70,8 @@ class ProductoListView(ListView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
+        ctx['buscar'] = self.request.session.get('f_buscar', '')
+        ctx['busqueda_activa'] = bool(self.request.session.get('f_buscar', ''))
         ctx['form'] = ProductoForm()  # Formulario embebido
         return ctx
 
@@ -92,6 +103,11 @@ class ProductoCreateView(CreateView):
         producto.save()
 
         messages.success(self.request, f"Producto '{producto.nombre}' creado correctamente.")
+
+        f_buscar = self.request.session.get('f_buscar', '')
+        if f_buscar:
+            return redirect(f"{self.success_url}?q={f_buscar}")
+
         return redirect(self.success_url)
 
     def form_invalid(self, form):
@@ -124,6 +140,9 @@ class ProductoUpdateView(UpdateView):
         producto.costo_promedio = self.calcular_costo_promedio(producto)
         producto.save()
         messages.success(self.request, f"Producto '{producto.nombre}' actualizado correctamente.")
+        f_q = self.request.session.get('f_q', '')
+        if f_q:
+            return redirect(f"{self.success_url}?q={f_q}")
         return super().form_valid(form)
 
     def calcular_stock_actual(self, producto):

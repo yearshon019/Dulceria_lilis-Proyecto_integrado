@@ -172,7 +172,16 @@
                 <label class="form-label">Stock actual</label>
                 {{ form.stock_actual }} {% for e in form.stock_actual.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
               </div>
-            </div>
+
+              <div class="col-md-4">
+                <label class="form-label">Alerta Bajo Stock </label>
+                <input type="text" class=" form-control" value="{% if form.instance.alerta_bajo %}Sí{% else %}No{% endif %}" readonly>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">Alerta Por Vencer</label>              </div>
+                <input class=" form-control" value="{% if form.instance.alerta_por_vencer %}Sí{% else %}No{% endif %}" readonly>
+              </div>
           </div>
 
         </div> <!-- /tab-content -->

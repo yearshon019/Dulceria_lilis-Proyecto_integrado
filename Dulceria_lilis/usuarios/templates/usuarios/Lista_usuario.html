@@ -35,7 +35,7 @@
 
             <div class="mb-2">
               <label class="form-label small fw-bold">Email</label>
-              <input type="email" name="email" class="form-control"
+              <input type= "text" name="email" class="form-control"
                      value="{{ form.email.value|default:'' }}">
               {% for e in form.email.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
             </div>

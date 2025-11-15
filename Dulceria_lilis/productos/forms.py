@@ -4,11 +4,21 @@ from django import forms
 from django.core.exceptions import ValidationError
 from .models import Producto
 
+CATEGORIA_CHOICES = [
+    ('ALFAJORES', 'ALFAJORES'),
+    ('CUCHUFLIS', 'CUCHUFLIS'),
+    ('TORTAS', 'TORTAS'),
+    ('PRODUCTOS A GRANEL', 'PRODUCTOS A GRANEL'),
+    ('CONFITERIA ARTESANAL', 'CONFITERIA ARTESANAL'),
+    ('REPOSTERIA', 'REPOSTERIA'),
+
+]
 UOM_CHOICES = [
-    ('UN', 'UN'),
-    ('KG', 'KG'),
-    ('LT', 'LT'),
-    ('CJ', 'CJ'),
+    ('UN', 'Unidad'),
+    ('KG', 'Kilogramo'),
+    ('PAQ', 'Paquete'),
+    ('CJ', 'Caja'),
+    ('G', 'Gramo'),
 ]
 
 # Función para verificar si el valor contiene números
@@ -27,11 +37,11 @@ class ProductoForm(forms.ModelForm):
         model = Producto
         fields = '__all__'
         widgets = {
-            'sku': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: CD1'}),
+            'sku': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: Sku1'}),
             'ean_upc': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Campo opcional'}),
             'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre del producto'}),
             'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Campo opcional'}),
-            'categoria': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: Papaya'}),
+            'categoria': forms.Select(attrs={'class': 'form-select'}, choices=CATEGORIA_CHOICES),
             'marca': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Campo opcional'}),
             'modelo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Campo opcional'}),
             'uom_compra': forms.Select(attrs={'class': 'form-select'}, choices=UOM_CHOICES),
@@ -66,9 +76,9 @@ class ProductoForm(forms.ModelForm):
         sku = self.cleaned_data.get('sku', '').upper().strip()
         if not sku:
             raise ValidationError("El campo SKU es obligatorio.")
-        # Validar formato CD + número positivo
-        if not re.match(r'^CD[0-9]+$', sku):
-            raise ValidationError("El SKU debe comenzar con 'CD' seguido de un número positivo (ej: CD1, CD25).")
+        # Validar formato Sku + número positivo
+        if not re.match(r'^SKU[0-9]+$', sku):
+            raise ValidationError("El SKU debe comenzar con 'Sku' seguido de un número positivo (ej: Sku1, Sku25).")
         # Verificar duplicado
         if Producto.objects.filter(sku=sku).exists():
             raise ValidationError("Ya existe un producto con este SKU.")
@@ -87,6 +97,8 @@ class ProductoForm(forms.ModelForm):
         nombre = self.cleaned_data.get('nombre', '').strip()
         if not nombre:
             raise ValidationError("Debe ingresar un nombre para el producto.")
+        if len(nombre) > 20:
+            raise ValidationError("El nombre del producto debe tener menos de 20 caracteres.")
         # Validación para asegurarse de que no contenga números
         if contiene_numeros(nombre):
             raise ValidationError("El nombre del producto no puede contener números.")
@@ -106,6 +118,8 @@ class ProductoForm(forms.ModelForm):
     
         if not marca:  # Si no hay valor para 'marca', lanzamos una validación
             raise ValidationError("El campo 'marca' no puede estar vacío.")
+        if len(marca) > 20:  # Validamos que la marca tenga menos de 20 caracteres
+            raise ValidationError("La marca debe tener menos de 20 caracteres.")
     
         marca = marca.strip()  # Si tiene valor, lo limpiamos
     
@@ -215,3 +229,9 @@ class ProductoForm(forms.ModelForm):
         if stock_actual is not None and stock_actual < 0:
             raise ValidationError("El stock actual no puede ser negativo.")
         return stock_actual
+    
+    def clean_descripcion(self):
+        descripcion = self.cleaned_data.get('descripcion')
+        if len(descripcion) > 1000:
+            raise ValidationError("La descripción debe tener menos de 1000 caracteres.")
+        return descripcion
