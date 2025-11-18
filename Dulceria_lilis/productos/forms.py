@@ -76,11 +76,14 @@ class ProductoForm(forms.ModelForm):
         sku = self.cleaned_data.get('sku', '').upper().strip()
         if not sku:
             raise ValidationError("El campo SKU es obligatorio.")
-        # Validar formato Sku + número positivo
         if not re.match(r'^SKU[0-9]+$', sku):
             raise ValidationError("El SKU debe comenzar con 'Sku' seguido de un número positivo (ej: Sku1, Sku25).")
-        # Verificar duplicado
-        if Producto.objects.filter(sku=sku).exists():
+
+        qs = Producto.objects.filter(sku=sku)
+        if self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+
+        if qs.exists():
             raise ValidationError("Ya existe un producto con este SKU.")
         return sku
 
@@ -89,9 +92,13 @@ class ProductoForm(forms.ModelForm):
         if ean:
             if not re.match(r'^[0-9]{8,13}$', ean):
                 raise ValidationError("El EAN/UPC debe tener entre 8 y 13 dígitos numéricos.")
-            if Producto.objects.filter(ean_upc=ean).exists():
+            qs = Producto.objects.filter(ean_upc=ean)
+            if self.instance.pk:
+                qs = qs.exclude(pk=self.instance.pk)
+            if qs.exists():
                 raise ValidationError("Ya existe un producto con este EAN/UPC.")
         return ean
+
 
     def clean_nombre(self):
         nombre = self.cleaned_data.get('nombre', '').strip()

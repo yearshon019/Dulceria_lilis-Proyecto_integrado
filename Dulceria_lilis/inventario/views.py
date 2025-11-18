@@ -1,3 +1,4 @@
+from django.forms import ValidationError
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, UpdateView
 from django.utils.decorators import method_decorator
@@ -6,8 +7,8 @@ from django.contrib import messages
 from django.db.models import Q
 from django.core.paginator import Paginator
 from django.views import View
-from django.http import HttpResponse
-
+from django.http import HttpResponse, JsonResponse
+from proveedores.models import ProductoProveedor
 from sistema.decorators import permiso_requerido
 from .models import MovimientoInventario, Bodega, Lote
 from .forms import MovimientoInventarioForm
@@ -86,7 +87,13 @@ class MovimientoInventarioListCreateView(View):
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
 
-        form = MovimientoInventarioForm()
+        if request.method == "POST":
+            form = MovimientoInventarioForm(request.POST)
+        else:
+            form = MovimientoInventarioForm(initial=request.GET)
+
+
+
 
         context = {
             'form': form,
@@ -106,10 +113,16 @@ class MovimientoInventarioListCreateView(View):
             movimiento = form.save(commit=False)
             if request.user.is_authenticated:
                 movimiento.usuario = request.user
-            movimiento.save()
-            messages.success(request, "✅ Movimiento registrado correctamente.")
-            return redirect('inventario:inicio')
+            try:
+                movimiento.save()
+                messages.success(request, "✅ Movimiento registrado correctamente.")
+                return redirect('inventario:inicio')
 
+            except ValidationError as e:
+                # Manda el error al formulario
+                form.add_error(None, e.message)
+                # Manda el error como alerta
+                messages.error(request, f"❌ {e.message}")
         if form.errors:
             messages.error(request, "⚠️ Por favor complete todos los campos obligatorios correctamente.")
 
@@ -140,6 +153,42 @@ class MovimientoInventarioListCreateView(View):
             'per_page': per_page,
         }
         return render(request, self.template_name, context)
+def productos_por_proveedor(request, proveedor_id):
+    productos = ProductoProveedor.objects.filter(
+        proveedor_id=proveedor_id
+    ).select_related("producto")
+
+    data = [
+        {"id": pp.producto.id,
+         "nombre": pp.producto.nombre,
+         "sku": pp.producto.sku if hasattr(pp.producto, "sku") else "",
+         }
+         for pp in productos
+    ]
+
+    return JsonResponse({"productos": data})
+def lotes_por_producto(request, producto_id):
+    """
+    Devuelve los lotes disponibles para un producto (solo stock > 0)
+    Se usa por AJAX cuando el usuario selecciona un producto.
+    """
+    lotes = Lote.objects.filter(
+        producto_id=producto_id,
+        cantidad_disponible__gt=0
+    ).order_by('codigo')
+
+    data = [
+        {
+            "id": lote.id,
+            "codigo": lote.codigo,
+            "descripcion": str(lote),
+            "disponible": float(lote.cantidad_disponible),
+        }
+        for lote in lotes
+    ]
+
+    return JsonResponse({"lotes": data})
+
 
 
 # ----------------------------------------------------------
