@@ -76,10 +76,15 @@
             <tr>
               <th>Fecha</th>
               <th>Tipo</th>
-              <th>Producto</th>
-              <th class="text-end">Cantidad</th>
+              <th>SKU</th>
+              <th>Proveedor</th>
               <th>Bodega Origen</th>
               <th>Bodega Destino</th>
+              <th class="text-end">Cantidad</th>
+              <th>Lote</th>
+              <th>Serie</th>
+              <th>Fecha de vencimineto</th>
+              <th>Doc Referencia</th>
               <th class="text-center">Acciones</th>
             </tr>
           </thead>
@@ -88,10 +93,15 @@
             <tr>
               <td>{{ mov.fecha|date:"d/m/Y H:i" }}</td>
               <td>{{ mov.tipo }}</td>
-              <td>{{ mov.producto.nombre }}</td>
-              <td class="text-end">{{ mov.cantidad }}</td>
+              <td>{{ mov.sku }}</td>
+              <th>{{ mov.proveedor|default:"—" }}</th>
               <td>{{ mov.bodega_origen|default:"—" }}</td>
               <td>{{ mov.bodega_destino|default:"—" }}</td>
+              <td class="text-end">{{ mov.cantidad }}</td>
+              <th> {{ mov.lote|default:"—" }} </th>
+              <th> {{ mov.serie|default:"—" }} </th>
+              <td> {{ mov.fecha_vencimiento|default:"—" }} </td>
+              <th> {{  mov.doc_referencia|default:"—"}} </th>
               <td class="text-center">
                 <div class="btn-group btn-group-sm" role="group">
                   <a href="{% url 'inventario:detalle_movimiento' mov.pk %}" class="btn btn-primary" title="Ver detalle">

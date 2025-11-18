@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'proveedores',
     'widget_tweaks',
     'sistema',
+    'rest_framework',
+    'api',
 ]
 
 MIDDLEWARE = [

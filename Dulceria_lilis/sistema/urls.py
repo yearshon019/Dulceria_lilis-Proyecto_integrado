@@ -5,6 +5,7 @@ from . import views
 from django.conf import settings
 from django.conf.urls.static import static
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', dashboard, name='dashboard'),  # home
@@ -14,7 +15,7 @@ urlpatterns = [
     path('inventario/', include('inventario.urls', namespace='inventario')),
     path('proveedores/', include('proveedores.urls', namespace='proveedores')),
     path('cambiar_clave/', views.cambiar_clave, name='cambiar_clave'),
-
+    path('api/', include('api.urls')),
 ]
 
 if settings.DEBUG:
