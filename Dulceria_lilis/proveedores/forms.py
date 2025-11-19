@@ -245,6 +245,16 @@ class ProductoProveedorInlineForm(forms.ModelForm):
             "descuento_pct": forms.NumberInput(attrs={"class": "form-control", "step": "0.01"}),
             "preferente": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Agregar data-costo a cada <option>
+        productos = Producto.objects.all()
+        self.fields["producto"].queryset = productos
+        self.costo_producto = {
+            p.id: float(p.costo_estandar or 0) for p in productos
+        }
     def clean_costo(self):
         costo = self.cleaned_data.get("costo")
 

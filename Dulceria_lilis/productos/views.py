@@ -97,9 +97,8 @@ class ProductoCreateView(CreateView):
             return self.form_invalid(form)
 
         producto = form.save(commit=False)
-        # Opcional: calcular stock_actual y costo_promedio
-        producto.stock_actual = self.calcular_stock_actual(producto)
-        producto.costo_promedio = self.calcular_costo_promedio(producto)
+        producto.stock_actual = 0
+        producto.costo_promedio = 0
         producto.save()
 
         messages.success(self.request, f"Producto '{producto.nombre}' creado correctamente.")
@@ -118,11 +117,6 @@ class ProductoCreateView(CreateView):
             'form': form,
         })
 
-    def calcular_stock_actual(self, producto):
-        return 100  # Ajusta según tu lógica de negocio
-
-    def calcular_costo_promedio(self, producto):
-        return 10.50  # Ajusta según tu lógica de negocio
 
 # ------------------------------
 # EDITAR PRODUCTO
@@ -136,8 +130,6 @@ class ProductoUpdateView(UpdateView):
 
     def form_valid(self, form):
         producto = form.save(commit=False)
-        producto.stock_actual = self.calcular_stock_actual(producto)
-        producto.costo_promedio = self.calcular_costo_promedio(producto)
         producto.save()
         messages.success(self.request, f"Producto '{producto.nombre}' actualizado correctamente.")
         f_q = self.request.session.get('f_q', '')
@@ -145,11 +137,6 @@ class ProductoUpdateView(UpdateView):
             return redirect(f"{self.success_url}?q={f_q}")
         return super().form_valid(form)
 
-    def calcular_stock_actual(self, producto):
-        return 100  # Sustituye por lógica real
-
-    def calcular_costo_promedio(self, producto):
-        return 10.50  # Sustituye por lógica real
 
 # ------------------------------
 # ELIMINAR PRODUCTO

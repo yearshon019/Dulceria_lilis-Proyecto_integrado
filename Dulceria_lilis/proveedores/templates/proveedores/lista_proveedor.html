@@ -228,7 +228,15 @@
           
               <div class="col-md-4">
                 <label class="form-label">Producto</label>
-                {{ rel_form.producto_rel }}
+                <select name="{{ rel_form.producto_rel.html_name }}" 
+                        class="form-select producto-rel-select">
+                    {% for prod in rel_form.fields.producto_rel.queryset %}
+                        <option value="{{ prod.id }}"
+                                data-costo="{{ prod.costo_estandar }}">
+                            {{ prod.sku }} - {{ prod.nombre }}
+                        </option>
+                    {% endfor %}
+                </select>
                 {% for e in rel_form.producto_rel.errors %}
                     <div class="text-danger small">{{ e }}</div>
                 {% endfor %}
@@ -236,9 +244,13 @@
           
               <div class="col-md-4">
                 <label class="form-label">Costo</label>
-                {{ rel_form.costo_rel }}
+                <input type="number" 
+                        name="{{ rel_form.costo_rel.html_name }}" 
+                        class="form-control costo-rel-input" 
+                        step="0.01"
+                        value="{{ rel_form.initial.costo_rel|default_if_none:'' }}">
                 {% for e in rel_form.costo_rel.errors %}
-                    <div class="text-danger small">{{ e }}</div>
+                  <div class="text-danger small">{{ e }}</div>
                 {% endfor %}
               </div>
           
@@ -307,6 +319,21 @@ function confirmarEliminacion(id) {
     cancelButtonText: 'Cancelar'
   }).then((res) => { if (res.isConfirmed) window.location.href = `/proveedores/${id}/eliminar/`; })
 }
+
+document.addEventListener("change", function (e) {
+    if (e.target.classList.contains("producto-rel-select")) {
+
+        const option = e.target.options[e.target.selectedIndex];
+        const costo = option.getAttribute("data-costo");
+
+        const costoInput = document.querySelector(".costo-rel-input");
+
+        if (costoInput && costo) {
+            costoInput.value = parseFloat(costo).toFixed(2);
+        }
+    }
+});
+
 </script>
 
 {% endblock %}

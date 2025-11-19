@@ -24,14 +24,49 @@ class MovimientoInventarioListCreateView(View):
     template_name = 'inventario/movimiento_list.html'
 
     def _apply_filters(self, request, qs):
-        tipo = (request.GET.get('tipo') or '').strip()
-        producto = (request.GET.get('producto') or '').strip()
-        bodega = (request.GET.get('bodega') or '').strip()
+        session = request.session
+
+        # ---- 1) Tomar valores desde GET (si vienen) ----
+        tipo_get    = request.GET.get('tipo')
+        buscar_get  = request.GET.get('buscar')   # <--- NUEVO nombre de campo
+        bodega_get  = request.GET.get('bodega')
+        pp_get      = request.GET.get('pp')
+
+        # ---- 2) Limpiar filtros si viene clear=1 ----
+        if request.GET.get("clear") == "1":
+            for k in ("f_tipo", "f_buscar", "f_bodega", "f_pp"):
+                session.pop(k, None)
+            return qs, "", "", "", 5  # qs, tipo, buscar, bodega, per_page
+
+        # ---- 3) Si vienen filtros por GET, guardarlos en sesión ----
+        if tipo_get is not None:
+            session["f_tipo"] = tipo_get
+        if buscar_get is not None:
+            session["f_buscar"] = buscar_get
+        if bodega_get is not None:
+            session["f_bodega"] = bodega_get
+        if pp_get is not None:
+            session["f_pp"] = pp_get
+
+        # ---- 4) Leer valores finales desde sesión (o default) ----
+        tipo    = session.get("f_tipo", "")
+        buscar  = session.get("f_buscar", "")
+        bodega  = session.get("f_bodega", "")
+        per_page = session.get("f_pp", "5")   # lo devolvemos como string, luego lo casteamos
+
+        # ---- 5) Aplicar filtros sobre el queryset ----
 
         if tipo:
             qs = qs.filter(tipo=tipo)
-        if producto:
-            qs = qs.filter(producto__nombre__icontains=producto)
+
+        # 🔎 BUSCADOR: por SKU de producto o proveedor (razón social / nombre fantasía)
+        if buscar:
+            qs = qs.filter(
+                Q(producto__sku__icontains=buscar) |
+                Q(proveedor__razon_social__icontains=buscar) |
+                Q(proveedor__nombre_fantasia__icontains=buscar)
+            )
+
         if bodega:
             tokens = [t.strip() for t in bodega.replace(';', ',').split(',') if t.strip()]
             q_obj = Q()
@@ -42,7 +77,9 @@ class MovimientoInventarioListCreateView(View):
                 q_obj |= Q(bodega_destino__nombre__icontains=t)
             qs = qs.filter(q_obj)
 
-        return qs, tipo, producto, bodega
+        return qs, tipo, buscar, bodega, per_page
+
+
 
     def get(self, request):
         movimientos = MovimientoInventario.objects.select_related(
@@ -73,37 +110,30 @@ class MovimientoInventarioListCreateView(View):
             return resp
 
         # ===== FILTROS =====
-        movimientos, tipo, producto, bodega = self._apply_filters(request, movimientos)
+        movimientos, tipo, buscar, bodega, per_page = self._apply_filters(request, movimientos)
 
         # ===== PAGINADOR =====
         try:
-            per_page = int(request.GET.get('pp') or 5)
-        except ValueError:
-            per_page = 5
-        if per_page not in (5, 10, 20):
-            per_page = 5
+            per_page_int = int(per_page)
+        except (TypeError, ValueError):
+            per_page_int = 5
+        if per_page_int not in (5, 10, 20):
+            per_page_int = 5
 
-        paginator = Paginator(movimientos, per_page)
+        paginator = Paginator(movimientos, per_page_int)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
 
-        if request.method == "POST":
-            form = MovimientoInventarioForm(request.POST)
-        else:
-            form = MovimientoInventarioForm(initial=request.GET)
-
-
-
-
+        form = MovimientoInventarioForm()
         context = {
             'form': form,
             'page_obj': page_obj,
             'movimientos': page_obj,
             'bodegas': Bodega.objects.all(),
             'f_tipo': tipo,
-            'f_producto': producto,
+            'f_buscar': buscar,
             'f_bodega': bodega,
-            'per_page': per_page,
+            'per_page': per_page_int,
         }
         return render(request, self.template_name, context)
 

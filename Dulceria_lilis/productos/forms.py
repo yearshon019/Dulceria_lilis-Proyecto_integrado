@@ -242,3 +242,4 @@ class ProductoForm(forms.ModelForm):
         if len(descripcion) > 1000:
             raise ValidationError("La descripción debe tener menos de 1000 caracteres.")
         return descripcion
+        

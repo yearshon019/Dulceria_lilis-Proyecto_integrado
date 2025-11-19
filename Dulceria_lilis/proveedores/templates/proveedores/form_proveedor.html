@@ -175,8 +175,27 @@
                   {% for f in pp_formset %}
                   <tr>
                     {{ f.id }}
-                    <td>{{ f.producto }} {% for error in f.producto.errors %} <div class="text-danger small">{{ error }}</div>{% endfor %}</td>
-                    <td>{{ f.costo }} {% for error in f.costo.errors %} <div class="text-danger small">{{ error }}</div>{% endfor %}</td>
+                    <td>
+                      <select name="{{ f.producto.html_name }}" class="form-select producto-select">
+                        {% for prod in f.fields.producto.queryset %}
+                          <option value="{{ prod.id }}" 
+                                  data-costo="{{ prod.costo_estandar }}"
+                                  {% if f.instance.producto and f.instance.producto.id == prod.id %}selected{% endif %}>
+                            {{ prod.sku }} - {{ prod.nombre }}
+                          </option>
+                        {% endfor %}
+                      </select>
+                      {% for error in f.producto.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                      {% endfor %}
+                    </td>
+                    <td>
+                      <input type="number" 
+                             name="{{ f.costo.html_name }}" 
+                             class="form-control costo-input" 
+                             step="0.01"
+                             value="{{ f.initial.costo|default_if_none:'' }}">
+                    </td>
                     <td>{{ f.lead_time_dias }} {%  for error in f.lead_time_dias.errors %} <div class="text-danger small">{{ error }}</div>{% endfor %}</td>
                     <td>{{ f.min_lote }} {%  for error in f.min_lote.errors %} <div class="text-danger small">{{ error }}</div>{% endfor %}</td>
                     <td>{{ f.descuento_pct }} {% for error in f.descuento_pct.errors %} <div class="text-danger small">{{ error }}</div>{% endfor %}</td>
@@ -262,6 +281,20 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
     });
+});
+document.addEventListener("change", function (e) {
+    if (e.target.classList.contains("producto-select")) {
+
+        const fila = e.target.closest("tr");
+        const costoInput = fila.querySelector(".costo-input");
+
+        const option = e.target.options[e.target.selectedIndex];
+        const costo = option.getAttribute("data-costo");
+
+        if (costo) {
+            costoInput.value = parseFloat(costo).toFixed(2);
+        }
+    }
 });
 
 </script>
