@@ -1,5 +1,7 @@
 from django.http import JsonResponse
-
+from rest_framework import viewsets
+from productos.models import Producto
+from .serializers import ProductoSerializer
 def info(request):
     return JsonResponse({
 
@@ -10,3 +12,7 @@ def info(request):
   "autor": "kevin ayala supremo"
 
 })
+
+class ProductoViewSet(viewsets.ModelViewSet):
+    queryset = Producto.objects.all()
+    serializer_class = ProductoSerializer
