@@ -45,8 +45,10 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'sistema',
     'rest_framework',
+    'rest_framework.authtoken',
     'api',
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -58,6 +60,11 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+}
 ROOT_URLCONF = 'sistema.urls'
 
 TEMPLATES = [
