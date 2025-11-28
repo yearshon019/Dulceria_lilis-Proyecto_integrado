@@ -68,12 +68,36 @@ class ProductoListView(ListView):
 
         return super().get(request, *args, **kwargs)
 
+<<<<<<< HEAD
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx['buscar'] = self.request.session.get('f_buscar', '')
         ctx['busqueda_activa'] = bool(self.request.session.get('f_buscar', ''))
         ctx['form'] = ProductoForm()  # Formulario embebido
         return ctx
+=======
+        # ===== PAGINADOR =====
+        try:
+            per_page_int = int(per_page)
+        except (TypeError, ValueError):
+            per_page_int = 10
+        if per_page_int not in (5, 10, 200, 1500):
+            per_page_int = 10
+
+        paginator = Paginator(productos, per_page_int)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+
+        context = {
+            'form': ProductoForm(),
+            'page_obj': page_obj,
+            'productos': page_obj,
+            'buscar': buscar,
+            'per_page': per_page_int,
+            'busqueda_activa': bool(buscar),
+        }
+        return render(request, self.template_name, context)
+>>>>>>> 04b2537 (todo casi todo casi casi casi casi todo)
 
 # ------------------------------
 # CREAR PRODUCTO (POST desde lista)

@@ -59,8 +59,18 @@ class ProveedorListView(ListView):
 
         return super().get(request, *args, **kwargs)
 
+<<<<<<< HEAD
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
+=======
+        # ===== PAGINADOR =====
+        try:
+            per_page_int = int(per_page)
+        except (TypeError, ValueError):
+            per_page_int = 10
+        if per_page_int not in (5, 10, 2000):
+            per_page_int = 10
+>>>>>>> 04b2537 (todo casi todo casi casi casi casi todo)
 
         # Formulario principal
         if "form" not in ctx:
