@@ -7,8 +7,11 @@
 <div class="container-fluid mt-3 px-0">
   <div class="row g-3 mx-0">
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> c9bd708 (cloude)
     <!-- ============== FORMULARIO (CREAR) ============== -->
     <div class="col-lg-3 col-md-4">
       <div class="card shadow-sm h-100">
@@ -31,11 +34,17 @@
               {% for e in form.username.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
             </div>
 
+<<<<<<< HEAD
 
 
             <div class="mb-2">
               <label class="form-label small fw-bold">Email</label>
               <input type= "text" name="email" class="form-control"
+=======
+            <div class="mb-2">
+              <label class="form-label small fw-bold">Email</label>
+              <input type="text" name="email" class="form-control"
+>>>>>>> c9bd708 (cloude)
                      value="{{ form.email.value|default:'' }}">
               {% for e in form.email.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
             </div>
@@ -67,18 +76,32 @@
                 <label class="form-label small fw-bold">Rol</label>
                 <select name="rol" class="form-select">
                   <option value="">Seleccione…</option>
+<<<<<<< HEAD
                   <option value="ADMIN"     {% if form.rol.value == 'ADMIN' %}selected{% endif %}>ADMIN</option>
                   <option value="PROVEEDOR" {% if form.rol.value == 'PROVEEDOR' %}selected{% endif %}>PROVEEDOR</option>
                   <option value="OPERADOR"  {% if form.rol.value == 'OPERADOR' %}selected{% endif %}>OPERADOR</option>
+=======
+                  <option value="ADMIN" {% if form.rol.value == 'ADMIN' %}selected{% endif %}>ADMIN</option>
+                  <option value="BODEGA" {% if form.rol.value == 'BODEGA' %}selected{% endif %}>BODEGA</option>
+                  <option value="CONSULTA" {% if form.rol.value == 'CONSULTA' %}selected{% endif %}>CONSULTA</option>
+                  <option value="PROVEEDOR" {% if form.rol.value == 'PROVEEDOR' %}selected{% endif %}>PROVEEDOR</option>
+                  <option value="OPERADOR" {% if form.rol.value == 'OPERADOR' %}selected{% endif %}>OPERADOR</option>
+>>>>>>> c9bd708 (cloude)
                 </select>
                 {% for e in form.rol.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
               </div>
               <div class="col">
                 <label class="form-label small fw-bold">Estado</label>
                 <select name="estado" class="form-select">
+<<<<<<< HEAD
                   <option value="ACTIVO"     {% if form.estado.value == 'ACTIVO' %}selected{% endif %}>ACTIVO</option>
                   <option value="INACTIVO"   {% if form.estado.value == 'INACTIVO' %}selected{% endif %}>INACTIVO</option>
                   <option value="BLOQUEADO"  {% if form.estado.value == 'BLOQUEADO' %}selected{% endif %}>BLOQUEADO</option>
+=======
+                  <option value="ACTIVO" {% if form.estado.value == 'ACTIVO' %}selected{% endif %}>ACTIVO</option>
+                  <option value="INACTIVO" {% if form.estado.value == 'INACTIVO' %}selected{% endif %}>INACTIVO</option>
+                  <option value="BLOQUEADO" {% if form.estado.value == 'BLOQUEADO' %}selected{% endif %}>BLOQUEADO</option>
+>>>>>>> c9bd708 (cloude)
                 </select>
                 {% for e in form.estado.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
               </div>
@@ -121,36 +144,65 @@
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="card-title mb-0">Usuarios</h5>
             <div class="col-md-2 d-grid">
+<<<<<<< HEAD
   <a class="btn btn-success"
      href="?q={{ f_q }}&rol={{ f_rol }}&estado={{ f_estado }}&export=xlsx">
     <i class="bi bi-file-earmark-excel"></i> Exportar Excel
   </a>
 </div>
 
+=======
+              <a class="btn btn-success"
+                 href="?q={{ f_q }}&rol={{ f_rol }}&estado={{ f_estado }}&export=xlsx">
+                <i class="bi bi-file-earmark-excel"></i> Exportar Excel
+              </a>
+            </div>
+>>>>>>> c9bd708 (cloude)
           </div>
 
           <!-- Filtros (GET) -->
           <form method="get" action="{% url 'usuarios:lista' %}" class="row g-2 mb-3" id="filtros">
+<<<<<<< HEAD
             <div class="col-md-5">
+=======
+            <div class="col-md-4">
+>>>>>>> c9bd708 (cloude)
               <input type="text" name="q" value="{{ f_q }}" class="form-control" placeholder="Buscar por username...">
             </div>
             <div class="col-md-3">
               <select name="rol" class="form-select" onchange="this.form.submit()">
                 <option value="">Rol: todos</option>
+<<<<<<< HEAD
                 <option value="ADMIN"     {% if f_rol == 'ADMIN' %}selected{% endif %}>ADMIN</option>
                 <option value="PROVEEDOR" {% if f_rol == 'PROVEEDOR' %}selected{% endif %}>PROVEEDOR</option>
                 <option value="OPERADOR"  {% if f_rol == 'OPERADOR' %}selected{% endif %}>OPERADOR</option>
+=======
+                <option value="ADMIN" {% if f_rol == 'ADMIN' %}selected{% endif %}>ADMIN</option>
+                <option value="BODEGA" {% if f_rol == 'BODEGA' %}selected{% endif %}>BODEGA</option>
+                <option value="CONSULTA" {% if f_rol == 'CONSULTA' %}selected{% endif %}>CONSULTA</option>
+                <option value="PROVEEDOR" {% if f_rol == 'PROVEEDOR' %}selected{% endif %}>PROVEEDOR</option>
+                <option value="OPERADOR" {% if f_rol == 'OPERADOR' %}selected{% endif %}>OPERADOR</option>
+>>>>>>> c9bd708 (cloude)
               </select>
             </div>
             <div class="col-md-3">
               <select name="estado" class="form-select" onchange="this.form.submit()">
                 <option value="">Estado: todos</option>
+<<<<<<< HEAD
                 <option value="ACTIVO"     {% if f_estado == 'ACTIVO' %}selected{% endif %}>ACTIVO</option>
                 <option value="INACTIVO"   {% if f_estado == 'INACTIVO' %}selected{% endif %}>INACTIVO</option>
                 <option value="BLOQUEADO"  {% if f_estado == 'BLOQUEADO' %}selected{% endif %}>BLOQUEADO</option>
               </select>
             </div>
             <div class="col-md-1 d-grid">
+=======
+                <option value="ACTIVO" {% if f_estado == 'ACTIVO' %}selected{% endif %}>ACTIVO</option>
+                <option value="INACTIVO" {% if f_estado == 'INACTIVO' %}selected{% endif %}>INACTIVO</option>
+                <option value="BLOQUEADO" {% if f_estado == 'BLOQUEADO' %}selected{% endif %}>BLOQUEADO</option>
+              </select>
+            </div>
+            <div class="col-md-2 d-grid">
+>>>>>>> c9bd708 (cloude)
               <button class="btn btn-primary">Filtrar</button>
             </div>
           </form>
@@ -180,7 +232,21 @@
                   <td>{{ usuario.email }}</td>
                   <td>{{ usuario.nombres }} {{ usuario.apellidos }}</td>
                   <td>{{ usuario.telefono|default:"—" }}</td>
+<<<<<<< HEAD
                   <td>{{ usuario.rol }}</td>
+=======
+                  <td>
+                    {% if usuario.rol == 'BODEGA' %}
+                      <span class="badge bg-warning text-dark">BODEGA</span>
+                    {% elif usuario.rol == 'CONSULTA' %}
+                      <span class="badge bg-info text-dark">CONSULTA</span>
+                    {% elif usuario.rol == 'ADMIN' %}
+                      <span class="badge bg-danger">ADMIN</span>
+                    {% else %}
+                      <span class="badge bg-secondary">{{ usuario.rol }}</span>
+                    {% endif %}
+                  </td>
+>>>>>>> c9bd708 (cloude)
                   <td>
                     {% if usuario.estado == 'ACTIVO' %}
                       <span class="badge bg-success">ACTIVO</span>
@@ -202,14 +268,26 @@
                         <i class="bi bi-pencil"></i>
                       </a>
 
+<<<<<<< HEAD
                       <!-- Botón eliminar con SweetAlert2 -->
+=======
+                      <a href="{% url 'usuarios:resetear_clave' usuario.pk %}" 
+                          class="btn btn-secondary text-white"
+                          onclick="return confirm('¿Resetear clave de {{ usuario.username }}?')">
+                          <i class="bi bi-key"></i>
+                      </a>
+
+>>>>>>> c9bd708 (cloude)
                       <button type="button"
                               class="btn btn-danger"
                               onclick="confirmarEliminacion('{{ usuario.pk }}','{{ usuario.username }}')">
                         <i class="bi bi-trash"></i>
                       </button>
 
+<<<<<<< HEAD
                       <!-- Form oculto para enviar el POST real -->
+=======
+>>>>>>> c9bd708 (cloude)
                       <form id="del-{{ usuario.pk }}" action="{% url 'usuarios:eliminar' usuario.pk %}" method="post" style="display:none">
                         {% csrf_token %}
                       </form>
@@ -218,7 +296,11 @@
                 </tr>
                 {% empty %}
                 <tr>
+<<<<<<< HEAD
                   <td colspan="10" class="text-center text-muted py-3">No hay usuarios registrados.</td>
+=======
+                  <td colspan="11" class="text-center text-muted py-3">No hay usuarios registrados.</td>
+>>>>>>> c9bd708 (cloude)
                 </tr>
                 {% endfor %}
               </tbody>
@@ -232,7 +314,10 @@
   </div>
 </div>
 
+<<<<<<< HEAD
 <!-- SweetAlert2 para confirmación bonita -->
+=======
+>>>>>>> c9bd708 (cloude)
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
   function confirmarEliminacion(id, username) {
@@ -248,11 +333,19 @@
       reverseButtons: true,
     }).then((r) => {
       if (r.isConfirmed) {
+<<<<<<< HEAD
         // envía el formulario POST oculto con CSRF
+=======
+>>>>>>> c9bd708 (cloude)
         document.getElementById(`del-${id}`).submit();
       }
     });
   }
+<<<<<<< HEAD
   
 </script>
 {% endblock %}
+=======
+</script>
+{% endblock %}
+>>>>>>> c9bd708 (cloude)

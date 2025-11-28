@@ -170,7 +170,6 @@ class ProveedorCreateView(CreateView):
         return render(self.request, 'proveedores/lista_proveedor.html', context)
 
 
-
 # ----------------------------------------------------------
 # EDITAR PROVEEDOR
 # ----------------------------------------------------------
@@ -237,7 +236,6 @@ class ProveedorUpdateView(UpdateView):
 
         # Si el formset tiene errores
         return render(self.request, self.template_name, self.get_context_data(form=form))
-
 
 
 # ----------------------------------------------------------

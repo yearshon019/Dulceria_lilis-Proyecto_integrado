@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 from rest_framework.response import Response
 from rest_framework import status, viewsets, permissions
@@ -5,6 +6,13 @@ from productos.models import Producto
 from .serializers import ProductoSerializer
 from rest_framework.permissions import IsAuthenticated
 from django.http import Http404, JsonResponse
+=======
+from django.http import JsonResponse
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import viewsets
+from productos.models import Producto
+from .serializers import ProductoSerializer
+>>>>>>> c9bd708 (cloude)
 def info(request):
     return JsonResponse({
 
@@ -19,6 +27,7 @@ def info(request):
 class ProductoViewSet(viewsets.ModelViewSet):
     queryset = Producto.objects.all()
     serializer_class = ProductoSerializer
+<<<<<<< HEAD
     permission_classes = [IsAuthenticated, permissions.DjangoModelPermissions]
 
 # -----------------------------
@@ -106,3 +115,6 @@ class ProductoViewSet(viewsets.ModelViewSet):
             )
 
         
+=======
+    permission_classes = [IsAuthenticated]
+>>>>>>> c9bd708 (cloude)

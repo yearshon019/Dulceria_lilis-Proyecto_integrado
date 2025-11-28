@@ -127,7 +127,6 @@ class UsuarioForm(forms.ModelForm):
         if not telefono:
             raise forms.ValidationError("Por favor, ingresa un teléfono.")
         telefono = telefono.strip()
-
         if not telefono.isdigit():
             raise forms.ValidationError("El teléfono debe contener solo números.")
         if len(telefono) != 9:
@@ -221,4 +220,3 @@ class PerfilForm(forms.ModelForm):
             raise ValidationError("Formato no permitido. Usa JPG, PNG o WEBP.")
         return file
     
-

@@ -10,6 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 import os
+<<<<<<< HEAD
+=======
+from datetime import timedelta
+>>>>>>> c9bd708 (cloude)
 from pathlib import Path
 from dotenv import load_dotenv
 from django.contrib.messages import constants
@@ -47,6 +51,10 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'api',
+<<<<<<< HEAD
+=======
+    'axes',
+>>>>>>> c9bd708 (cloude)
 ]
 
 
@@ -55,11 +63,44 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+<<<<<<< HEAD
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+=======
+    'django.contrib.auth.middleware.AuthenticationMiddleware',   # ← 1°
+    'django.contrib.messages.middleware.MessageMiddleware',      # ← 2° (OBLIGATORIO aquí)
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
+    # TUS MIDDLEWARES PERSONALIZADOS VAN DESPUÉS:
+    'sistema.middleware.CurrentUserMiddleware',        # ← AHORA SÍ FUNCIONA
+    'axes.middleware.AxesMiddleware',
+    'usuarios.middleware.NoCacheAuthenticatedMiddleware',  # si lo tienes
+    'sistema.middleware.ForzarCambioClaveMiddleware',
+]
+
+AUTHENTICATION_BACKENDS = [
+    'axes.backends.AxesStandaloneBackend',  # ← AGREGAR PRIMERO
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+# Configuración de bloqueo
+AXES_FAILURE_LIMIT = 5  # Máximo 5 intentos fallidos
+AXES_COOLOFF_TIME = timedelta(seconds=30)   # Bloqueo por 1 hora (en horas)
+AXES_RESET_ON_SUCCESS = True  # Resetear contador tras login exitoso
+AXES_LOCKOUT_TEMPLATE = 'usuarios/account_locked.html'  # Usa mensaje de error en el form
+AXES_LOCKOUT_PARAMETERS = [["username", "ip_address"]]
+AXES_ENABLE_ACCESS_FAILURE_LOG = True
+AXES_VERBOSE = True  # Logs detallados
+AXES_USERNAME_FIELD_LENGTH = 150
+AXES_IP_ADDRESS_FIELD_LENGTH = 45
+AXES_ENABLE_ACCESS_LOG = True
+# Mensaje de bloqueo personalizado
+AXES_COOLOFF_MESSAGE = "Cuenta temporalmente bloqueada por intentos fallidos. Intenta nuevamente en {cooloff_time}."
+
+>>>>>>> c9bd708 (cloude)
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',

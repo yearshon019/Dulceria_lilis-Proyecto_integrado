@@ -5,6 +5,7 @@ class ProductoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Producto
         fields = '__all__'
+<<<<<<< HEAD
 
     def validador_completo(self, data):
         if not data['producto']:
@@ -20,3 +21,5 @@ class ProductoSerializer(serializers.ModelSerializer):
         if len(data['lead_time_dias']) < 1:
             raise serializers.ValidationError('El lead time debe ser mayor a 0')
         return data
+=======
+>>>>>>> c9bd708 (cloude)

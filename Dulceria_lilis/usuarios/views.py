@@ -138,7 +138,6 @@ def usuario_create(request):
     messages.error(request, 'Revisa los errores del formulario.')
     return render(request, 'usuarios/Lista_usuario.html', ctx)
 
-
 # ✏️ EDITAR USUARIO
 @login_required
 @permission_required('usuarios.change_usuario', raise_exception=False)

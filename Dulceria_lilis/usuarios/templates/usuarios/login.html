@@ -12,11 +12,42 @@
             <p class="text-muted small">Inicia sesión para continuar</p>
         </div>
 
+<<<<<<< HEAD
         {% if form.non_field_errors %}
         <div class="alert alert-danger py-2">{{ form.non_field_errors }}</div>
         {% endif %}
 
         <form method="post" novalidate>
+=======
+        <!-- MENSAJE DE BLOQUEO CON TIEMPO RESTANTE (dinámico) -->
+        {% if request.axes_locked_out %}
+            {% if request.axes_remaining_time %}
+                <div class="alert alert-danger py-3 text-center mb-3">
+                    <i class="bi bi-lock-fill fs-4"></i><br><br>
+                    <strong>Cuenta bloqueada temporalmente</strong><br>
+                    <small class="text-white">
+                        Demasiados intentos fallidos.<br>
+                        Podrás intentarlo de nuevo en <strong>{{ request.axes_remaining_time }}</strong>.
+                    </small>
+                </div>
+            {% else %}
+                <div class="alert alert-danger py-3 text-center mb-3">
+                    <i class="bi bi-lock-fill fs-4"></i><br><br>
+                    <strong>Cuenta bloqueada temporalmente</strong><br>
+                    <small class="text-white">Demasiados intentos fallidos. Intenta más tarde.</small>
+                </div>
+            {% endif %}
+        {% endif %}
+
+        <!-- Errores generales del formulario -->
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger py-2 mb-3">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        <form method="post" novalidate {% if request.axes_locked_out %}inert{% endif %}>
+>>>>>>> c9bd708 (cloude)
             {% csrf_token %}
 
             <div class="mb-3 input-group">
@@ -26,7 +57,11 @@
                 {{ form.username }}
             </div>
             {% if form.username.errors %}
+<<<<<<< HEAD
             <div class="text-danger small mb-2">{{ form.username.errors }}</div>
+=======
+                <div class="text-danger small mb-2">{{ form.username.errors|join:"<br>" }}</div>
+>>>>>>> c9bd708 (cloude)
             {% endif %}
 
             <div class="mb-3 input-group">
@@ -36,10 +71,18 @@
                 {{ form.password }}
             </div>
             {% if form.password.errors %}
+<<<<<<< HEAD
             <div class="text-danger small mb-2">{{ form.password.errors }}</div>
             {% endif %}
 
             <button class="btn btn-danger w-100 fw-semibold mt-2" type="submit">
+=======
+                <div class="text-danger small mb-2">{{ form.password.errors|join:"<br>" }}</div>
+            {% endif %}
+
+            <button class="btn btn-danger w-100 fw-semibold mt-3 shadow-sm" type="submit"
+                    {% if request.axes_locked_out %}disabled{% endif %}>
+>>>>>>> c9bd708 (cloude)
                 <i class="bi bi-box-arrow-in-right"></i> Entrar
             </button>
 
@@ -51,4 +94,8 @@
         </form>
     </div>
 </div>
+<<<<<<< HEAD
 {% endblock %}
+=======
+{% endblock %}
+>>>>>>> c9bd708 (cloude)
