@@ -147,7 +147,12 @@
           <!-- 2) Stock y control -->
           <div class="tab-pane fade" id="pane-stock" role="tabpanel">
             <div class="row g-3">
-              <div class="col-md-4">{{ form.stock_minimo.label_tag }} {{ form.stock_minimo }}</div>
+              <div class="col-md-4">{{ form.stock_minimo.label_tag }} {{ form.stock_minimo }} {% if form.stock_minimo.errors %}
+                    <div class="text-danger">
+                        {{ form.stock_minimo.errors }}
+                    </div>
+                {% endif %}
+            </div>
               <div class="col-md-4">{{ form.stock_maximo.label_tag }} {{ form.stock_maximo }}</div>
               <div class="col-md-4">{{ form.punto_reorden.label_tag }} {{ form.punto_reorden }}</div>
               <div class="col-md-4 form-check mt-4">{{ form.perishable }} <label class="form-check-label">Perishable</label></div>

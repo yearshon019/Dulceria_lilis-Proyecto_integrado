@@ -66,6 +66,8 @@ class ProductoForm(forms.ModelForm):
             'sku': {'required': 'Ingrese el SKU del producto.'},
             'nombre': {'required': 'Ingrese el nombre del producto.'},
             'categoria': {'required': 'Ingrese la categoría del producto.'},
+            'stock_minimo': {'required': 'El stock mínimo es obligatorio.'},  # 👈 AÑADIR ESTO
+
         }
 
 # ==========================
@@ -183,9 +185,19 @@ class ProductoForm(forms.ModelForm):
 
     def clean_stock_minimo(self):
         stock_min = self.cleaned_data.get('stock_minimo')
-        if stock_min is None or stock_min < 0:
+
+        # Si viene None, lo tratamos como vacío
+        if stock_min == 0:
+            # Puedes dejar que lo maneje el 'required' del Meta,
+            # o lanzar tú el mismo mensaje:
+            raise ValidationError("El stock mínimo es obligatorio.")
+
+        if stock_min < 0:
             raise ValidationError("El stock mínimo no puede ser negativo.")
+
         return stock_min
+
+
 
     def clean_stock_maximo(self):
         stock_max = self.cleaned_data.get('stock_maximo')
@@ -242,4 +254,6 @@ class ProductoForm(forms.ModelForm):
         if len(descripcion) > 1000:
             raise ValidationError("La descripción debe tener menos de 1000 caracteres.")
         return descripcion
+    
+
         
