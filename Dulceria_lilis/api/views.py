@@ -2,11 +2,10 @@
 from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 from rest_framework import status, viewsets
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminOrReadOnly
 from django.http import Http404, JsonResponse
 from .serializers import ProductoSerializer
 from productos.models import Producto
-from .permissions import IsAdminOrReadOnly
 
 def info(request):
     return JsonResponse({
